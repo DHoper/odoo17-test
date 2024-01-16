@@ -17899,7 +17899,7 @@ msgstr "車隊的不允許費用"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_module_uninstall
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: base
 #: model_terms:res.partner,website_description:base.res_partner_1

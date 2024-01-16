@@ -1488,7 +1488,7 @@ msgstr "網站上可見的說明"
 #: model_terms:ir.ui.view,arch_db:website_forum.post_answer
 #: model_terms:ir.ui.view,arch_db:website_forum.post_comment
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: website_forum
 #: model:gamification.badge,name:website_forum.badge_6

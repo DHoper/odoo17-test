@@ -341,7 +341,7 @@ msgstr "設計師 － 電視/電影佈景"
 #. module: hr_skills
 #: model_terms:ir.ui.view,arch_db:hr_skills.hr_employee_cv_wizard_view_form
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: hr_skills
 #: model:ir.model.fields,field_description:hr_skills.field_hr_employee_cv_wizard__display_name

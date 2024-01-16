@@ -4033,7 +4033,7 @@ msgstr "消失"
 #: code:addons/website/static/src/xml/website.editor.xml:0
 #, python-format
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.new_page_template_gallery_s_banner
@@ -12586,7 +12586,7 @@ msgstr "女性"
 msgid ""
 "Would you like to save before being redirected? Unsaved changes will be "
 "discarded."
-msgstr "您想在被重新指向之前儲存嗎？未儲存的更改將被捨棄."
+msgstr "您想在被重新指向之前儲存嗎？未儲存的更改將被取消."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_blockquote

@@ -5526,7 +5526,7 @@ msgstr "折扣%"
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_reversal
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_register_form
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: account
 #. odoo-python

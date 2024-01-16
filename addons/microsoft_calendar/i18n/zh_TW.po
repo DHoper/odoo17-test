@@ -167,7 +167,7 @@ msgstr "從微軟日曆帳戶中刪除。"
 #: code:addons/microsoft_calendar/static/src/views/microsoft_calendar/microsoft_calendar_controller.js:0
 #, python-format
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: microsoft_calendar
 #: model:ir.model.fields,field_description:microsoft_calendar.field_microsoft_calendar_account_reset__display_name

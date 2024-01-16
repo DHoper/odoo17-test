@@ -126,7 +126,7 @@ msgstr "delta單位"
 #. module: data_recycle
 #: model_terms:ir.ui.view,arch_db:data_recycle.view_data_recycle_record_list
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: data_recycle
 #: model_terms:ir.ui.view,arch_db:data_recycle.view_data_recycle_record_search

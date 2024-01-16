@@ -1961,7 +1961,7 @@ msgstr "拆卸順序"
 #: model_terms:ir.ui.view,arch_db:mrp.view_mrp_production_split_form
 #: model_terms:ir.ui.view,arch_db:mrp.view_mrp_production_split_multi_form
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: mrp
 #. odoo-javascript

@@ -2605,7 +2605,7 @@ msgstr "你看完整篇文章嗎？"
 #: code:addons/website_slides/static/src/js/public/components/slide_unsubscribe_dialog/slide_unsubscribe_dialog.xml:0
 #, python-format
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: website_slides
 #: model_terms:slide.slide,html_content:website_slides.slide_slide_demo_1_4

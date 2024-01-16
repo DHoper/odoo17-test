@@ -316,7 +316,7 @@ msgstr "已送貨"
 #. module: sms
 #: model_terms:ir.ui.view,arch_db:sms.sms_template_preview_form
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: sms
 #: model:ir.model.fields,field_description:sms.field_sms_composer__display_name

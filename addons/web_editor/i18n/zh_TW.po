@@ -1031,12 +1031,12 @@ msgstr "設備"
 #: model_terms:ir.ui.view,arch_db:web_editor.snippets
 #, python-format
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippets
 msgid "Discard record"
-msgstr "捨棄記錄"
+msgstr "取消記錄"
 
 #. module: web_editor
 #. odoo-javascript

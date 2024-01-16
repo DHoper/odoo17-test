@@ -82,7 +82,7 @@ export class Many2ManyTagsField extends Component {
                 createEdit: this.props.canCreateEdit,
                 onDelete: removeRecord,
             },
-            getEvalParams: (props) => {
+            getEvalParams: props => {
                 return {
                     evalContext: this.evalContext,
                     readonly: props.readonly,
@@ -90,22 +90,27 @@ export class Many2ManyTagsField extends Component {
             },
         });
 
-        this.update = (recordlist) => {
+        this.update = recordlist => {
             if (!recordlist) {
                 return;
             }
             if (Array.isArray(recordlist)) {
-                const resIds = recordlist.map((rec) => rec.id);
+                const resIds = recordlist.map(rec => rec.id);
                 return saveRecord(resIds);
             }
             return saveRecord(recordlist);
         };
 
         if (this.props.canQuickCreate) {
-            this.quickCreate = async (name) => {
-                const created = await this.orm.call(this.relation, "name_create", [name], {
-                    context: this.props.context,
-                });
+            this.quickCreate = async name => {
+                const created = await this.orm.call(
+                    this.relation,
+                    "name_create",
+                    [name],
+                    {
+                        context: this.props.context,
+                    }
+                );
                 return saveRecord([created[0]]);
             };
         }
@@ -118,7 +123,11 @@ export class Many2ManyTagsField extends Component {
         return this.props.record.evalContext;
     }
     get string() {
-        return this.props.string || this.props.record.fields[this.props.name].string || "";
+        return (
+            this.props.string ||
+            this.props.record.fields[this.props.name].string ||
+            ""
+        );
     }
 
     getTagProps(record) {
@@ -127,8 +136,10 @@ export class Many2ManyTagsField extends Component {
             resId: record.resId,
             text: record.data.display_name,
             colorIndex: record.data[this.props.colorField],
-            onDelete: !this.props.readonly ? () => this.deleteTag(record.id) : undefined,
-            onKeydown: (ev) => {
+            onDelete: !this.props.readonly
+                ? () => this.deleteTag(record.id)
+                : undefined,
+            onKeydown: ev => {
                 if (this.props.readonly) {
                     return;
                 }
@@ -138,7 +149,7 @@ export class Many2ManyTagsField extends Component {
     }
 
     get tags() {
-        return this.props.record.data[this.props.name].records.map((record) =>
+        return this.props.record.data[this.props.name].records.map(record =>
             this.getTagProps(record)
         );
     }
@@ -154,20 +165,23 @@ export class Many2ManyTagsField extends Component {
 
     async deleteTag(id) {
         const tagRecord = this.props.record.data[this.props.name].records.find(
-            (record) => record.id === id
+            record => record.id === id
         );
         await this.props.record.data[this.props.name].forget(tagRecord);
     }
 
     getDomain() {
         const domain =
-            typeof this.props.domain === "function" ? this.props.domain() : this.props.domain;
-        const currentIds = this.props.record.data[this.props.name].currentIds.filter(
-            (id) => typeof id === "number"
-        );
-        return Domain.and([domain, Domain.not([["id", "in", currentIds]])]).toList(
-            this.props.context
-        );
+            typeof this.props.domain === "function"
+                ? this.props.domain()
+                : this.props.domain;
+        const currentIds = this.props.record.data[
+            this.props.name
+        ].currentIds.filter(id => typeof id === "number");
+        return Domain.and([
+            domain,
+            Domain.not([["id", "in", currentIds]]),
+        ]).toList(this.props.context);
     }
 }
 
@@ -203,7 +217,9 @@ export const many2ManyTagsField = {
             label: _t("Can create"),
             name: "create",
             type: "string",
-            help: _t("Write a domain to allow the creation of records conditionnally."),
+            help: _t(
+                "Write a domain to allow the creation of records conditionnally."
+            ),
         },
         {
             label: _t("Color field"),
@@ -217,7 +233,11 @@ export const many2ManyTagsField = {
     relatedFields: ({ options }) => {
         const relatedFields = [{ name: "display_name", type: "char" }];
         if (options.color_field) {
-            relatedFields.push({ name: options.color_field, type: "integer", readonly: false });
+            relatedFields.push({
+                name: options.color_field,
+                type: "integer",
+                readonly: false,
+            });
         }
         return relatedFields;
     },
@@ -267,7 +287,7 @@ export class Many2ManyTagsFieldColorEditable extends Many2ManyTagsField {
 
     getTagProps(record) {
         const props = super.getTagProps(record);
-        props.onClick = (ev) => this.onBadgeClick(ev, record);
+        props.onClick = ev => this.onBadgeClick(ev, record);
         return props;
     }
 
@@ -292,13 +312,16 @@ export class Many2ManyTagsFieldColorEditable extends Many2ManyTagsField {
 
     onTagVisibilityChange(isHidden, tag) {
         const tagRecord = this.props.record.data[this.props.name].records.find(
-            (record) => record.id === tag.id
+            record => record.id === tag.id
         );
         if (tagRecord.data[this.props.colorField] != 0) {
-            this.previousColorsMap[tagRecord.resId] = tagRecord.data[this.props.colorField];
+            this.previousColorsMap[tagRecord.resId] =
+                tagRecord.data[this.props.colorField];
         }
         const changes = {
-            [this.props.colorField]: isHidden ? 0 : this.previousColorsMap[tagRecord.resId] || 1,
+            [this.props.colorField]: isHidden
+                ? 0
+                : this.previousColorsMap[tagRecord.resId] || 1,
         };
         tagRecord.update(changes, { save: true });
         this.popover.close();
@@ -306,9 +329,12 @@ export class Many2ManyTagsFieldColorEditable extends Many2ManyTagsField {
 
     switchTagColor(colorIndex, tag) {
         const tagRecord = this.props.record.data[this.props.name].records.find(
-            (record) => record.id === tag.id
+            record => record.id === tag.id
         );
-        tagRecord.update({ [this.props.colorField]: colorIndex }, { save: true });
+        tagRecord.update(
+            { [this.props.colorField]: colorIndex },
+            { save: true }
+        );
         this.popover.close();
     }
 }
@@ -331,4 +357,6 @@ export const many2ManyTagsFieldColorEditable = {
     },
 };
 
-registry.category("fields").add("form.many2many_tags", many2ManyTagsFieldColorEditable);
+registry
+    .category("fields")
+    .add("form.many2many_tags", many2ManyTagsFieldColorEditable);

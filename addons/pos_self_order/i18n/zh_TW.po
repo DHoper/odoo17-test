@@ -373,7 +373,7 @@ msgstr "停用"
 #: code:addons/pos_self_order/static/src/app/pages/product_page/product_page.xml:0
 #, python-format
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: pos_self_order
 #: model:ir.model.fields,field_description:pos_self_order.field_pos_self_order_custom_link__display_name

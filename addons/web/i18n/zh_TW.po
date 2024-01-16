@@ -2531,7 +2531,7 @@ msgstr ""
 #: code:addons/web/static/src/webclient/settings_form_view/settings_confirmation_dialog.xml:0
 #, python-format
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: web
 #. odoo-javascript
@@ -2539,7 +2539,7 @@ msgstr "捨棄"
 #: code:addons/web/static/src/views/form/form_status_indicator/form_status_indicator.xml:0
 #, python-format
 msgid "Discard changes"
-msgstr "捨棄變更"
+msgstr "取消變更"
 
 #. module: web
 #. odoo-javascript

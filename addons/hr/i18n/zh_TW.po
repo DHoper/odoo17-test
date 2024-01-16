@@ -1039,7 +1039,7 @@ msgstr "目錄"
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.hr_departure_wizard_view_form
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: hr
 #: model_terms:hr.job,website_description:hr.job_ceo

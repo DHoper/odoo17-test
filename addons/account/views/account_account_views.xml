@@ -8,9 +8,7 @@
                 <form string="Account">
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button class="oe_stat_button" name="action_open_related_taxes"
-                                    type="object" icon="fa-bars"
-                                    invisible="related_taxes_amount == 0">
+                            <button class="oe_stat_button" name="action_open_related_taxes" type="object" icon="fa-bars" invisible="related_taxes_amount == 0">
                                 <div class="o_stat_info">
                                     <span class="o_stat_value">
                                         <field name="related_taxes_amount"/>
@@ -20,8 +18,7 @@
                                     </span>
                                 </div>
                             </button>
-                            <button class="oe_stat_button" name="account.action_move_line_select"
-                                    type="action" icon="fa-bars">
+                            <button class="oe_stat_button" name="account.action_move_line_select" type="action" icon="fa-bars">
                                 <div class="o_stat_info">
                                     <span class="o_stat_value">
                                         <field name="current_balance"/>
@@ -47,9 +44,7 @@
                                     <div class="col col-md-8">
                                         <label for="name" string="Account Name"/>
                                         <div>
-                                            <field name="name"
-                                                   placeholder="e.g. Current Assets"
-                                                   style="width:80% !important;"/>
+                                            <field name="name" placeholder="e.g. Current Assets" style="width:80% !important;"/>
                                         </div>
                                     </div>
                                 </div>
@@ -89,7 +84,7 @@
             <field name="name">account.account.list</field>
             <field name="model">account.account</field>
             <field name="arch" type="xml">
-                <tree editable="top" create="1" delete="1" multi_edit="1" string="Chart of accounts"  open_form_view="True">
+                <tree editable="top" create="1" delete="1" multi_edit="1" string="Chart of accounts" open_form_view="True">
                     <field name="company_id" column_invisible="True"/>
                     <field name="code"/>
                     <field name="name"/>
@@ -120,14 +115,19 @@
                             <div t-attf-class="oe_kanban_global_click">
                                 <div class="row">
                                     <div class="col-8">
-                                        <strong><field name="name"/></strong>
+                                        <strong>
+                                            <field name="name"/>
+                                        </strong>
                                     </div>
                                     <div class="col-4 text-end">
-                                        <span class="badge rounded-pill"><t t-out="record.code.value"/></span>
+                                        <span class="badge rounded-pill">
+                                            <t t-out="record.code.value"/>
+                                        </span>
                                     </div>
                                 </div>
                                 <div>
-                                    <strong>Type: </strong><t t-out="record.account_type.value"/>
+                                    <strong>Type: </strong>
+                                    <t t-out="record.account_type.value"/>
                                 </div>
                             </div>
                         </t>
@@ -171,16 +171,17 @@
             <field name="search_view_id" ref="view_account_search"/>
             <field name="view_id" ref="view_account_list"/>
             <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
+                <p class="o_view_nocontent_smiling_face">
                 Add a new account
-              </p><p>
+                </p>
+                <p>
                 An account is part of a ledger allowing your company
                 to register all kinds of debit and credit transactions.
                 Companies present their annual accounts in two main parts: the
                 balance sheet and the income statement (profit and loss
                 account). The annual accounts of a company are required by law
                 to disclose a certain amount of information.
-              </p>
+                </p>
             </field>
             <field name="context">{'search_default_activeacc': True}</field>
         </record>

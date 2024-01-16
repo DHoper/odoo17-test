@@ -65,7 +65,7 @@ msgstr "確認"
 #: code:addons/product_matrix/static/src/xml/product_matrix_dialog.xml:0
 #, python-format
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: product_matrix
 #: model:product.attribute,name:product_matrix.product_attribute_gender

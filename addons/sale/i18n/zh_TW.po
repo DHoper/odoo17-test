@@ -1954,7 +1954,7 @@ msgstr "折扣%"
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_cancel_view_form
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_line_wizard_form
 msgid "Discard"
-msgstr "捨棄"
+msgstr "取消"
 
 #. module: sale
 #. odoo-python
