@@ -13,9 +13,6 @@ class CardTimeConfigModel(models.Model):
     timeConfig_brief = fields.Char(string="描述", required=False)
 
     color = fields.Integer("標籤顏色", default=0)
-    display_name = fields.Char(
-        string="顯示名稱", compute="_compute_display_name", store=True
-    )
 
     @api.depends("timeConfig_name")
     def _compute_display_name(self):
@@ -44,21 +41,10 @@ class CardTimeConfigModel(models.Model):
             self._context.get("default_start_time", "09"),
             self._context.get("default_end_time", "18"),
         ),
-        limit=7,
     )
 
     @api.model
     def create(self, values):
-        # if (
-        #     "timeConfig_permissions" not in values
-        #     and "day_of_week" in self._fields
-        #     and self._fields["day_of_week"].readonly
-        # ):
-        #     values["timeConfig_permissions"] = self._default_permissions(
-        #         values.get("start_time", False),
-        #         values.get("end_time", False),
-        #     )
-
         if "timeConfig_name" in values and not values["timeConfig_name"].startswith(
             "(時間)"
         ):

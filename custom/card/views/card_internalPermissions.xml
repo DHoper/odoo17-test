@@ -7,9 +7,8 @@
             <form string="目前尚無資料" delete="True">
                 <sheet>
                     <group>
-                        <field name="readOnly" readonly="True" />
                         <field name="useable_card_reader"/>
-                        <field name="useable_time_permissions" readonly="readOnly"/>
+                        <field name="useable_time_permissions"/>
                     </group>
                 </sheet>
             </form>
@@ -22,9 +21,8 @@
         <field name="model">card.internal_permissions</field>
         <field name="arch" type="xml">
             <tree string="目前尚無資料">
-                <field name="readOnly" readonly="True" />
                 <field name="useable_card_reader"/>
-                <field name="useable_time_permissions" readonly="readOnly" widget='many2many_tags' options="{'no_quick_create': True, 'color_field': 'color', 'no_edit_color': True}"/>
+                <field name="useable_time_permissions" readonly="context.get('readOnly', False)" widget='many2many_tags' options="{'no_quick_create': True, 'color_field': 'color', 'no_edit_color': True}"/>
             </tree>
         </field>
     </record>

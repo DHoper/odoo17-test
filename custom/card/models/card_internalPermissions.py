@@ -21,7 +21,7 @@ class CardInternalPermissions(models.Model):
     useable_card_reader = fields.Selection(
         selection=lambda self: self._get_useable_card_reader_selections(),
         string="讀卡機",
-        tracking=True,
+        required=True,
     )
     useable_time_permissions = fields.Many2many(
         "card.internal_time_config",
@@ -29,9 +29,6 @@ class CardInternalPermissions(models.Model):
         required=True,
     )
     color = fields.Integer("標籤顏色", default=0)
-    display_name = fields.Char(
-        string="顯示名稱", compute="_compute_display_name", store=True
-    )
 
     @api.depends("useable_card_reader")
     def _compute_display_name(self):
@@ -55,16 +52,3 @@ class CardInternalPermissions(models.Model):
         return [
             (str(record.id), record.device_name) for record in usable_cardReader_records
         ]
-
-    readOnly = fields.Boolean(
-        string="根據上下文設定的字段",
-        compute="_compute_context_dependent_field",
-        store=False,
-    )
-
-    @api.depends_context("readOnly")
-    def _compute_context_dependent_field(self):
-        for record in self:
-            context_value = self.env.context.get("readOnly", False)
-            if context_value is not None:
-                record.readOnly = context_value

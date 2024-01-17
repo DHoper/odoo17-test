@@ -9,9 +9,7 @@ class CardInternalManagementModel(models.Model):
     _name = "card.internal_management"
     _description = "內部卡片管理"
 
-    internal_management_cardHolder = fields.Many2one(
-        "hr.employee", string="持卡人", tracking=True
-    )
+    internal_management_cardHolder = fields.Many2one("hr.employee", string="持卡人")
     internal_management_remark = fields.Char(string="卡片註記")
     internal_management_uid = fields.Char(string="卡片UID", size=10, required=True)
     internal_management_active = fields.Boolean(
@@ -22,16 +20,25 @@ class CardInternalManagementModel(models.Model):
     )
     internal_management_validDate = fields.Date(string="卡片效期")
     internal_management_group = fields.Many2many("card.internal_group", string="啟用群組")
+
+    def _get_permissions_type(self):
+        for record in self:
+            if len(record.internal_management_group) > 0:
+                return self._compute_internal_management_permissions()
+            else:
+                return None
+
     internal_management_permissions = fields.One2many(
         "card.internal_permissions",
         "permission_id",
         string="卡片權限",
+        default=_get_permissions_type,
     )
 
-    @api.onchange("internal_management_group", "internal_management_group.value")
+    @api.depends("internal_management_group")
     def _compute_internal_management_permissions(self):
         for record in self:
-            if record.internal_management_group:
+            if len(record.internal_management_group) > 0:
                 group_permissions = self.env["card.internal_permissions"].search(
                     [
                         (
@@ -42,9 +49,10 @@ class CardInternalManagementModel(models.Model):
                     ]
                 )
                 record.internal_management_permissions = [(6, 0, group_permissions.ids)]
+                return [(6, 0, group_permissions.ids)]
             else:
                 record.internal_management_permissions = [(5, 0, 0)]
 
-    # def delete_record(self):
-    #     self.ensure_one()
-    #     self.unlink()
+    @api.onchange("internal_management_group")
+    def _onchange_internal_management_group(self):
+        self._compute_internal_management_permissions()

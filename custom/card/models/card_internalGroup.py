@@ -19,12 +19,8 @@ class CardInternalGroupModel(models.Model):
         "card.internal_permissions",
         "group_permission_id",
         string="許可權限",
-        require="True"
     )
     color = fields.Integer("標籤顏色", default=0)
-    display_name = fields.Char(
-        string="顯示名稱", compute="_compute_display_name", store=True
-    )
 
     @api.depends("internal_group_name")
     def _compute_display_name(self):

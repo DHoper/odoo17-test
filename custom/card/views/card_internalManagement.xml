@@ -12,7 +12,7 @@
         <field name="arch" type="xml">
             <tree string="目前尚無資料">
                 <field name="internal_management_cardHolder" widget="many2one_avatar_user"/>
-                <field name="internal_management_remark"/>
+                <field name="internal_management_remark" class="w-20"/>
                 <field name="internal_management_uid"/>
                 <field name="internal_management_active"/>
                 <field name="internal_management_validDate"/>
@@ -106,7 +106,7 @@
                                                                             <label for="internal_group_permissions" class="form-label">許可權限</label>
                                                                             <div>
                                                                                 <field name="internal_group_permissions" class="form-control">
-                                                                                    <tree string="目前尚無資料" readonly="True" editable="buttom">
+                                                                                    <tree string="目前尚無資料" readonly="True" no_open="True">
                                                                                         <field name="useable_card_reader"/>
                                                                                         <field name="useable_time_permissions" widget='many2many_tags' options="{'no_quick_create': True, 'color_field': 'color', 'no_edit_color': True}"/>
                                                                                     </tree>
@@ -128,7 +128,12 @@
                                         <div class="mb-3">
                                             <label for="internal_management_permissions" class="form-label">卡片權限</label>
                                             <div>
-                                                <field name="internal_management_permissions" class="form-control w-100" context="{'readOnly':internal_management_group.length > 0}" readonly="internal_management_group.length > 0" force_save="1" />
+                                                <field name="internal_management_permissions" class="form-control w-100" context="{'readOnly': internal_management_group.length > 0}" readonly="internal_management_group.length > 0">
+                                                    <tree string="目前尚無資料" no_open="True">
+                                                        <field name="useable_card_reader"/>
+                                                        <field name="useable_time_permissions" widget='many2many_tags' options="{'no_quick_create': True, 'color_field': 'color', 'no_edit_color': True}"/>
+                                                    </tree>
+                                                </field>
                                             </div>
                                         </div>
                                     </div>
