@@ -26,10 +26,6 @@
         <field name="binding_model_id" ref="account.model_account_account"/>
     </record>
 
-    <menuitem id="menu_Balance_report"
-              name="Trial Balance"
-              sequence="7"
-              action="action_account_balance_menu"
-              parent="base_accounting_kit.account_reports_audit"/>
+    <menuitem id="menu_Balance_report" name="Trial Balance" sequence="7" action="action_account_balance_menu" parent="base_accounting_kit.account_reports_audit"/>
 
 </odoo>

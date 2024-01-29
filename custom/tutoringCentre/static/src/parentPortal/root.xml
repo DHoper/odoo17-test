@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tutoringCentre.Root">
+        哈囉，握的!
+        <div class="d-flex flex-column mb-5">
+            <div t-if="this.sanitizedMessages.length &gt; 0" class="message-list border border-danger" style="min-height: 300px;">
+                <t t-foreach="this.sanitizedMessages" t-as="message" t-key="message.id">
+                    <div class="message p-2 mb-2 rounded border">
+                        <div t-if="message.author.name" class="fw-bold">
+                            <span t-esc="message.author.name"/>
+                        </div>
+                        <div t-esc="message.sanitizedBody
+                        " class="mt-1"/>
+                        <small class="text-muted" t-esc="message.write_date"/>
+                    </div>
+                </t>
+            </div>
+
+
+            <textarea t-model="state.text" class="form-control my-2" placeholder="請輸入訊息"/>
+            <button class="btn btn-primary align-self-end" t-on-click="onClickSendMessage">發送</button>
+
+        </div>
+    </t>
+</templates>

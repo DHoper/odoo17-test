@@ -19,10 +19,8 @@
                     <notebook invisible="type not in ['accounts','account_type', 'account_report']">
                         <page string="Report">
                             <group>
-                                <field name="display_detail"
-                                       invisible="type not in ['accounts','account_type']"/>
-                                <field name="account_report_id"
-                                       invisible="type not in ['accounts','account_report']"/>
+                                <field name="display_detail" invisible="type not in ['accounts','account_type']"/>
+                                <field name="account_report_id" invisible="type not in ['accounts','account_report']"/>
                             </group>
                             <field name="account_ids" invisible="type != 'accounts'"/>
                             <field name="account_type_ids" invisible="type != 'account_type'"/>
@@ -54,33 +52,22 @@
                     <field name="type"/>
                     <field name="account_report_id"/>
                     <group expand="0" string="Group By">
-                        <filter string="Parent Report"
-                                name="filter_parent_rep"
-                                domain=""
-                                context="{'group_by':'parent_id'}"/>
-                        <filter string="Report Type"
-                                name="filter_rep_type"
-                                domain="[]"
-                                context="{'group_by':'type'}"/>
+                        <filter string="Parent Report" name="filter_parent_rep" domain="" context="{'group_by':'parent_id'}"/>
+                        <filter string="Report Type" name="filter_rep_type" domain="[]" context="{'group_by':'type'}"/>
                     </group>
                 </search>
             </field>
         </record>
 
-        <record id="action_account_financial_report_tree"
-                model="ir.actions.act_window">
+        <record id="action_account_financial_report_tree" model="ir.actions.act_window">
             <field name="name">Financial Reports</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">account.financial.report</field>
             <field name="view_mode">tree,form</field>
-            <field name="search_view_id"
-                   ref="view_account_financial_report_search"/>
+            <field name="search_view_id" ref="view_account_financial_report_search"/>
             <field name="view_id" ref="view_account_financial_report_tree"/>
         </record>
 
-        <menuitem id="menu_account_financial_reports_tree"
-                  name="Account Reports" parent="account.account_account_menu"
-                  action="action_account_financial_report_tree"
-        />
+        <menuitem id="menu_account_financial_reports_tree" name="Account Reports" parent="account.account_account_menu" action="action_account_financial_report_tree" />
     </data>
 </odoo>

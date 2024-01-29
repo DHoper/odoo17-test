@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_financial_report_user,account_fin_rep_name_user,model_account_financial_report,base.group_user,1,1,1,1
+
+access_account_common_account_report,access.account.common.account.report,model_account_common_account_report,base.group_user,1,1,1,1
+access_accounting_report_tax_report,access.accounting_report.account.tax.report,model_accounting_report_account_tax_report,base.group_user,1,1,1,1
+
+
+access_account_account_type,account.account.type,model_account_account_type,base.group_user,1,1,1,1
+
+
+
+
+
