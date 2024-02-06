@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="tutoringCentre.parentPortal">&lt;!DOCTYPE html&gt;
+    <template id="tutoringCentre.root">&lt;!DOCTYPE html&gt;
         <html>
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>

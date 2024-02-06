@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="tutoring_centre_root" name="補習班">
+        <menuitem id="tutoring_centre_member" name="會員">
+            <menuitem id="tutoring_centre_member_list" action="tutoring_centre_member_action" name="會員列表" />
+        </menuitem>
+        <menuitem id="tutoring_centre_course" name="課程">
+            <!-- <menuitem id="tutoring_centre_course_list" action="tutoring_centre_course_action" name="課程" /> -->
+        </menuitem>
+        <menuitem id="tutoring_centre_totur_talk" name="ToturTalk">
+            <menuitem id="totur_talk_channel" action="tutor_talk_channel_action" name="頻道設定" />
+            <menuitem id="totur_talk_parent_pick" action="tutor_talk_parent_pick_action" name="測" />
+        </menuitem>
+    </menuitem>
+</odoo>

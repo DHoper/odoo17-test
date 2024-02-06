@@ -104,7 +104,11 @@ export function parseSearchQuery(search) {
 export function routeToUrl(route) {
     const search = objectToUrlEncodedString(route.search);
     const hash = objectToUrlEncodedString(route.hash);
-    return route.pathname + (search ? "?" + search : "") + (hash ? "#" + hash : "");
+    return (
+        route.pathname +
+        (search ? "?" + search : "") +
+        (hash ? "#" + hash : "")
+    );
 }
 
 function getRoute(urlObj) {
@@ -119,7 +123,7 @@ function makeRouter(env) {
     const lockedKeys = new Set();
     let current = getRoute(browser.location);
     let pushTimeout;
-    browser.addEventListener("hashchange", (ev) => {
+    browser.addEventListener("hashchange", ev => {
         browser.clearTimeout(pushTimeout);
         const loc = new URL(ev.newURL);
         current = getRoute(loc);
@@ -134,14 +138,29 @@ function makeRouter(env) {
         let allPushArgs = [];
         function doPush() {
             // Aggregates push/replace state arguments
-            const replace = allPushArgs.some(([, options]) => options && options.replace);
-            const newHash = allPushArgs.reduce((finalHash, [hash, options]) => {
-                hash = applyLocking(lockedKeys, hash, current.hash, options);
-                if (finalHash) {
-                    hash = applyLocking(lockedKeys, hash, finalHash, options);
-                }
-                return Object.assign(finalHash || {}, hash);
-            }, null);
+            const replace = allPushArgs.some(
+                ([, options]) => options && options.replace
+            );
+            const newHash = allPushArgs.reduce(
+                (finalHash, [hash, options]) => {
+                    hash = applyLocking(
+                        lockedKeys,
+                        hash,
+                        current.hash,
+                        options
+                    );
+                    if (finalHash) {
+                        hash = applyLocking(
+                            lockedKeys,
+                            hash,
+                            finalHash,
+                            options
+                        );
+                    }
+                    return Object.assign(finalHash || {}, hash);
+                },
+                null
+            );
             // Calculates new route based on aggregated hash and options
             const newRoute = computeNewRoute(newHash, replace, current);
             if (!newRoute) {

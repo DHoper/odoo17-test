@@ -6,33 +6,79 @@ from markupsafe import Markup
 from odoo.exceptions import UserError
 from werkzeug.exceptions import NotFound
 import logging
-
+import paho.mqtt.publish as publish
 
 _logger = logging.getLogger(__name__)
 
 
-class YourController(Controller):
-    @route("/tutoringCentre/parentPortal", auth="public", website=True)
-    def parentPortal(self):
+class TutoringCentreController(Controller):
+    @route(
+        ["/tutoringCentre", "/tutoringCentre/<path:subpath>"],
+        auth="public",
+        website=True,
+    )
+    def _render_tutoringCentre(self, config_id=None):
         return request.render(
-            "tutoringCentre.parentPortal",
+            "tutoringCentre.root",
             {
                 "session_info": request.env["ir.http"].get_frontend_session_info(),
             },
         )
 
+    @add_guest_to_context
+    @route(
+        "/tutoringCentre/api/userInfo",
+        type="json",
+        auth="public",
+    )
+    def _get_user_info(self):
+        user_values = {
+            field: request.env.user[field] for field in request.env.user._fields
+        }
+        return user_values
+
+    @route(
+        "/tutoringCentre/api/createMember",
+        type="json",
+        auth="public",
+    )
+    def _create_member(self, userID, studentName):
+        new_member = (
+            request.env["tutoring_centre.member"]
+            .sudo()
+            .create_member(str(userID), studentName)
+        )
+        new_member_values = {field: new_member[field] for field in new_member._fields}
+        return new_member_values
+
+    @route(
+        "/tutoringCentre/api/memberInfo",
+        type="json",
+        auth="public",
+    )
+    def _get_member_info(self, userID):
+        memberTuple = (
+            request.env["tutoring_centre.member"]
+            .sudo()
+            .search([("portal_user", "=", userID)], limit=1)
+        )
+        if not memberTuple:
+            return False
+        member_values = {field: memberTuple[field] for field in memberTuple._fields}
+        return member_values
+
     def _get_guest_name(self):
         return _("Visitor")
 
     @route(
-        "/tutoringCentre/parentPortal/buildChat",
+        "/tutoringCentre/TutorTalk/api/livechat/buildChat",
         methods=["POST"],
         type="json",
         auth="public",
         cors="*",
     )
     @add_guest_to_context
-    def get_chat_session(
+    def create_chat(
         self,
         channel_id,
         anonymous_name,
@@ -84,7 +130,6 @@ class YourController(Controller):
                 lang=request.httprequest.cookies.get("frontend_lang"),
             )
         )
-
         if not channel_vals:
             _logger.warning("channel_vals is False")
             return False
@@ -131,38 +176,36 @@ class YourController(Controller):
         if guest:
             channel_info["guest_token"] = guest._format_auth_cookie()
 
-        # current_user_id = request.env.user.id
-        # new_channel = request.env["discuss.channel"].create(
-        #     {
-        #         "name": "Your Channel Name",
-        #         "description": "Your Channel Description",
-        #         "channel_type": "livechat",
-        #         "channel_member_ids": [
-        #             (
-        #                 0,
-        #                 0,
-        #                 {
-        #                     "partner_id": 2,
-        #                     "is_pinned": False,
-        #                 },
-        #                 {"partner_id": current_user_id},
-        #             )
-        #         ],
-        #     }
-        # )
+        return {
+            "channel_info": channel_info,
+            "channel": channel,
+        }
 
-        return channel_info
+    @route(
+        "/tutoringCentre/TutorTalk/api/livechat/fetchChannel",
+        methods=["POST"],
+        type="json",
+        auth="public",
+        cors="*",
+    )
+    def _fetch_channel(self, channel_uuid):
+        channel = (
+            request.env["discuss.channel"].sudo().search([("uuid", "=", channel_uuid)])
+        )
+        if not channel:
+            return
+        return channel
 
-    @route("/tutoringCentre/livechat/send_message", type="json", auth="public")
+    @route(
+        "/tutoringCentre/TutorTalk/api/livechat/send_message",
+        type="json",
+        auth="public",
+    )
     def send_message_to_livechat(self, channel_uuid, message):
         channel = (
             request.env["discuss.channel"]
             .sudo()
             .search([("uuid", "=", channel_uuid)], limit=1)
-        )
-
-        _logger.info(
-            f"============================================================>{request.env.user.partner_id.id}"
         )
         if channel and channel.channel_type == "livechat":
             channel.message_post(
@@ -173,82 +216,32 @@ class YourController(Controller):
                 message_type="comment",
                 subtype_xmlid="mail.mt_comment",
             )
-            return {"success": True}
+            user_values = {
+                field: channel[field]
+                for field in request.env["discuss.channel"]._fields
+            }
+            return user_values
         else:
             return {"success": False, "error": _("Invalid LiveChat channel")}
 
     @route(
-        "/tutoringCentre/parentPortal/get_channel_messages", type="json", auth="public"
+        "/tutoringCentre/TutorTalk/api/parentPickup",
+        type="json",
+        auth="user",
     )
-    def channel_fetch_messages(self, channel_uuid, last_id=None, limit=20):
-        try:
-            channel = (
-                request.env["discuss.channel"]
-                .sudo()
-                .search([("uuid", "=", channel_uuid)], limit=1)
-            )
-            if not channel:
-                return {"error": "找不到該頻道"}
+    def send_message_to_mqtt(self, childName):
+        # 指定樹莓派 MQTT Broker 的地址和連接埠
+        mqtt_broker_address = "172.16.162.41"
+        mqtt_broker_port = 1883
 
-            messages = channel.sudo()._channel_fetch_message(
-                last_id=int(last_id) if last_id else False, limit=int(limit)
-            )
+        # 發佈的主題和消息
+        topic = "tutoringCentre/parentPickup"
+        message_to_publish = "王小名"
 
-            return {"messages": messages}
-        except Exception as e:
-            return {"error": str(e)}
-
-    @route("/tutoringCentre/parentPortal/send_bus_message", type="json", auth="public")
-    def send_bus_message(self, channel_uuid, message):
-        bus = request.env["bus.bus"]
-        channel_info = (
-            request.env["discuss.channel"]
-            .sudo()
-            .search([("uuid", "=", channel_uuid)], limit=1)
+        # 使用 Paho MQTT Client 發佈消息
+        publish.single(
+            topic,
+            message_to_publish,
+            hostname=mqtt_broker_address,
+            port=mqtt_broker_port,
         )
-        if channel_info:
-            bus._sendone(
-                "tutoringCentre_channel",
-                {
-                    "channel_uuid": channel_uuid,
-                    "message": message,
-                },
-            )
-            return {"success": True}
-        else:
-            return {"success": False, "error": _("Invalid channel")}
-
-        @route(
-            "/tutoringCentre/ABC/<int:channel_id>",
-            methods=["GET"],
-            type="http",
-            auth="public",
-            csrf=True,
-        )
-        @add_guest_to_context
-        def discuss_channel(self, channel_id):
-            channel = request.env["discuss.channel"].search([("id", "=", channel_id)])
-            if not channel:
-                raise NotFound()
-            return self._response_discuss_public_template(channel)
-
-        def _response_discuss_public_template(
-            self, channel, discuss_public_view_data=None
-        ):
-            discuss_public_view_data = discuss_public_view_data or {}
-            return request.render(
-                "mail.discuss_public_channel_template",
-                {
-                    "data": {
-                        "channelData": channel._channel_info()[0],
-                        "discussPublicViewData": dict(
-                            {
-                                "shouldDisplayWelcomeViewInitially": channel.default_display_mode
-                                == "video_full_screen",
-                            },
-                            **discuss_public_view_data,
-                        ),
-                    },
-                    "session_info": channel.env["ir.http"].session_info(),
-                },
-            )

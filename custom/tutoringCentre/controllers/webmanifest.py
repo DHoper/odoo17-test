@@ -16,9 +16,9 @@ class TutoringCentreManifest(http.Controller):
     )
     def webmanifest(self):
         manifest = {
-            "name": "家長平台2.0",
-            "scope": "/tutoringCentre/parentPortal",
-            "start_url": "/tutoringCentre/parentPortal",
+            "name": "補習班平台",
+            "scope": "/tutoringCentre",
+            "start_url": "/tutoringCentre",
             "display": "standalone",
             "background_color": "#714B67",
             "theme_color": "#714B67",
@@ -43,7 +43,7 @@ class TutoringCentreManifest(http.Controller):
         return response
 
     @http.route(
-        "/tutoringCentre/service-worker.js",
+        "/tutoringCentre/service-worker",
         type="http",
         auth="public",
         methods=["GET"],
@@ -53,7 +53,7 @@ class TutoringCentreManifest(http.Controller):
             self._get_service_worker_content(),
             [
                 ("Content-Type", "text/javascript"),
-                ("Service-Worker-Allowed", "/tutoringCentre/parentPortal"),
+                ("Service-Worker-Allowed", "/tutoringCentre"),
             ],
         )
         return response

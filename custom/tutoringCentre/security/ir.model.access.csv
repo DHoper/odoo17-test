@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_tutoring_centre_member,tutoring_centre.member,model_tutoring_centre_member,base.group_user,1,1,1,1
+access_tutoring_centre_member_student,tutoring_centre.member_student,model_tutoring_centre_member_student,base.group_user,1,1,1,1
+access_tutoring_centre_course,tutoring_centre.course,model_tutoring_centre_course,base.group_user,1,1,1,1
+
+access_tutor_talk_channel,tutor_talk_channel,model_tutor_talk_channel,base.group_user,1,1,1,1
+access_tutor_talk_parent_pick,tutor_talk_parent_pick,model_tutor_talk_parent_pick,base.group_user,1,1,1,1

@@ -49,7 +49,9 @@ export class ThreadService {
      * @returns {Promise<import("models").Thread|undefined>}
      */
     async fetchChannel(id) {
-        const channelData = await this.rpc("/discuss/channel/info", { channel_id: id });
+        const channelData = await this.rpc("/discuss/channel/info", {
+            channel_id: id,
+        });
         if (!channelData) {
             return;
         }
@@ -61,7 +63,9 @@ export class ThreadService {
     }
 
     async fetchChannelMembers(thread) {
-        const known_member_ids = thread.channelMembers.map((channelMember) => channelMember.id);
+        const known_member_ids = thread.channelMembers.map(
+            channelMember => channelMember.id
+        );
         const results = await this.rpc("/discuss/channel/members", {
             channel_id: thread.id,
             known_member_ids: known_member_ids,
@@ -86,7 +90,8 @@ export class ThreadService {
      * @param {import("models").Thread} thread
      */
     markAsRead(thread) {
-        const newestPersistentMessage = thread.newestPersistentNotEmptyOfAllMessage;
+        const newestPersistentMessage =
+            thread.newestPersistentNotEmptyOfAllMessage;
         if (!newestPersistentMessage && !thread.isLoaded) {
             thread.isLoadedDeferred
                 .then(() => new Promise(setTimeout))
@@ -105,7 +110,7 @@ export class ThreadService {
                 .then(() => {
                     this.updateSeen(thread, newestPersistentMessage.id);
                 })
-                .catch((e) => {
+                .catch(e => {
                     if (e.code !== 404) {
                         throw e;
                     }
@@ -118,8 +123,13 @@ export class ThreadService {
         }
     }
 
-    updateSeen(thread, lastSeenId = thread.newestPersistentNotEmptyOfAllMessage?.id) {
-        const lastReadIndex = thread.messages.findIndex((message) => message.id === lastSeenId);
+    updateSeen(
+        thread,
+        lastSeenId = thread.newestPersistentNotEmptyOfAllMessage?.id
+    ) {
+        const lastReadIndex = thread.messages.findIndex(
+            message => message.id === lastSeenId
+        );
         let newNeedactionCounter = 0;
         let newUnreadCounter = 0;
         for (const message of thread.messages.slice(lastReadIndex + 1)) {
@@ -156,7 +166,9 @@ export class ThreadService {
      * @param {import("models").Thread} thread
      */
     async markAsFetched(thread) {
-        await this.orm.silent.call("discuss.channel", "channel_fetched", [[thread.id]]);
+        await this.orm.silent.call("discuss.channel", "channel_fetched", [
+            [thread.id],
+        ]);
     }
 
     getFetchRoute(thread) {
@@ -198,13 +210,18 @@ export class ThreadService {
         }
         try {
             // ordered messages received: newest to oldest
-            const { messages: rawMessages } = await this.rpc(this.getFetchRoute(thread), {
-                ...this.getFetchParams(thread),
-                limit: FETCH_LIMIT,
-                after,
-                before,
+            const { messages: rawMessages } = await this.rpc(
+                this.getFetchRoute(thread),
+                {
+                    ...this.getFetchParams(thread),
+                    limit: FETCH_LIMIT,
+                    after,
+                    before,
+                }
+            );
+            const messages = this.store.Message.insert(rawMessages.reverse(), {
+                html: true,
             });
-            const messages = this.store.Message.insert(rawMessages.reverse(), { html: true });
             thread.isLoaded = true;
             return messages;
         } catch (e) {
@@ -221,11 +238,14 @@ export class ThreadService {
     async fetchNewMessages(thread) {
         if (
             thread.status === "loading" ||
-            (thread.isLoaded && ["discuss.channel", "mail.box"].includes(thread.model))
+            (thread.isLoaded &&
+                ["discuss.channel", "mail.box"].includes(thread.model))
         ) {
             return;
         }
-        const after = thread.isLoaded ? thread.newestPersistentMessage?.id : undefined;
+        const after = thread.isLoaded
+            ? thread.newestPersistentMessage?.id
+            : undefined;
         try {
             const fetched = await this.fetchMessages(thread, { after });
             // feed messages
@@ -235,7 +255,9 @@ export class ThreadService {
             if (after === undefined) {
                 startIndex = 0;
             } else {
-                const afterIndex = thread.messages.findIndex((message) => message.id === after);
+                const afterIndex = thread.messages.findIndex(
+                    message => message.id === after
+                );
                 if (afterIndex === -1) {
                     // there might have been a jump to message during RPC fetch.
                     // Abort feeding messages as to not put holes in message list.
@@ -244,9 +266,11 @@ export class ThreadService {
                     startIndex = afterIndex + 1;
                 }
             }
-            const alreadyKnownMessages = new Set(thread.messages.map((m) => m.id));
+            const alreadyKnownMessages = new Set(
+                thread.messages.map(m => m.id)
+            );
             const filtered = fetched.filter(
-                (message) =>
+                message =>
                     !alreadyKnownMessages.has(message.id) &&
                     (thread.persistentMessages.length === 0 ||
                         message.id < thread.oldestPersistentMessage.id ||
@@ -260,7 +284,10 @@ export class ThreadService {
                 Record.MAKE_UPDATE(() => {
                     for (const message of fetched) {
                         const thread = message.originThread;
-                        if (thread && message.notIn(thread.needactionMessages)) {
+                        if (
+                            thread &&
+                            message.notIn(thread.needactionMessages)
+                        ) {
                             thread.needactionMessages.unshift(message);
                         }
                     }
@@ -269,15 +296,21 @@ export class ThreadService {
                 const startNeedactionIndex =
                     after === undefined
                         ? 0
-                        : thread.messages.findIndex((message) => message.id === after);
+                        : thread.messages.findIndex(
+                              message => message.id === after
+                          );
                 const filteredNeedaction = fetched.filter(
-                    (message) =>
+                    message =>
                         message.isNeedaction &&
                         (thread.needactionMessages.length === 0 ||
                             message.id < thread.needactionMessages[0].id ||
                             message.id > thread.needactionMessages.at(-1).id)
                 );
-                thread.needactionMessages.splice(startNeedactionIndex, 0, ...filteredNeedaction);
+                thread.needactionMessages.splice(
+                    startNeedactionIndex,
+                    0,
+                    ...filteredNeedaction
+                );
             }
             Object.assign(thread, {
                 loadOlder:
@@ -308,11 +341,15 @@ export class ThreadService {
                 around: messageId,
             });
             thread.isLoaded = true;
-            thread.messages = this.store.Message.insert(messages.reverse(), { html: true });
+            thread.messages = this.store.Message.insert(messages.reverse(), {
+                html: true,
+            });
             thread.loadNewer = messageId ? true : false;
             thread.loadOlder = true;
             if (messages.length < FETCH_LIMIT) {
-                const olderMessagesCount = messages.filter(({ id }) => id < messageId).length;
+                const olderMessagesCount = messages.filter(
+                    ({ id }) => id < messageId
+                ).length;
                 if (olderMessagesCount < FETCH_LIMIT / 2) {
                     thread.loadOlder = false;
                 } else {
@@ -332,14 +369,21 @@ export class ThreadService {
             }
         }
         if (ids.length) {
-            const previews = await this.orm.call("discuss.channel", "channel_fetch_preview", [ids]);
+            const previews = await this.orm.call(
+                "discuss.channel",
+                "channel_fetch_preview",
+                [ids]
+            );
             Record.MAKE_UPDATE(() => {
                 for (const preview of previews) {
                     const thread = this.store.Thread.get({
                         model: "discuss.channel",
                         id: preview.id,
                     });
-                    const message = this.store.Message.insert(preview.last_message, { html: true });
+                    const message = this.store.Message.insert(
+                        preview.last_message,
+                        { html: true }
+                    );
                     if (message.isNeedaction) {
                         thread.needactionMessages.add(message);
                     }
@@ -360,21 +404,30 @@ export class ThreadService {
         ) {
             return;
         }
-        const before = epoch === "older" ? thread.oldestPersistentMessage?.id : undefined;
-        const after = epoch === "newer" ? thread.newestPersistentMessage?.id : undefined;
+        const before =
+            epoch === "older" ? thread.oldestPersistentMessage?.id : undefined;
+        const after =
+            epoch === "newer" ? thread.newestPersistentMessage?.id : undefined;
         try {
-            const fetched = await this.fetchMessages(thread, { after, before });
+            const fetched = await this.fetchMessages(thread, {
+                after,
+                before,
+            });
             if (
-                (after !== undefined && !thread.messages.some((message) => message.id === after)) ||
-                (before !== undefined && !thread.messages.some((message) => message.id === before))
+                (after !== undefined &&
+                    !thread.messages.some(message => message.id === after)) ||
+                (before !== undefined &&
+                    !thread.messages.some(message => message.id === before))
             ) {
                 // there might have been a jump to message during RPC fetch.
                 // Abort feeding messages as to not put holes in message list.
                 return;
             }
-            const alreadyKnownMessages = new Set(thread.messages.map(({ id }) => id));
+            const alreadyKnownMessages = new Set(
+                thread.messages.map(({ id }) => id)
+            );
             const messagesToAdd = fetched.filter(
-                (message) => !alreadyKnownMessages.has(message.id)
+                message => !alreadyKnownMessages.has(message.id)
             );
             if (epoch === "older") {
                 thread.messages.unshift(...messagesToAdd);
@@ -409,9 +462,14 @@ export class ThreadService {
         if (thread.model !== "discuss.channel") {
             return;
         }
-        return this.orm.silent.call("discuss.channel", "channel_pin", [thread.id], {
-            pinned: false,
-        });
+        return this.orm.silent.call(
+            "discuss.channel",
+            "channel_pin",
+            [thread.id],
+            {
+                pinned: false,
+            }
+        );
     }
 
     pin(thread) {
@@ -419,9 +477,14 @@ export class ThreadService {
             return;
         }
         thread.is_pinned = true;
-        return this.orm.silent.call("discuss.channel", "channel_pin", [thread.id], {
-            pinned: true,
-        });
+        return this.orm.silent.call(
+            "discuss.channel",
+            "channel_pin",
+            [thread.id],
+            {
+                pinned: true,
+            }
+        );
     }
 
     /** @deprecated */
@@ -431,7 +494,10 @@ export class ThreadService {
         );
         this.store.discuss.chats.threads.sort(
             (t1, t2) =>
-                compareDatetime(t2.lastInterestDateTime, t1.lastInterestDateTime) || t2.id - t1.id
+                compareDatetime(
+                    t2.lastInterestDateTime,
+                    t1.lastInterestDateTime
+                ) || t2.id - t1.id
         );
     }
 
@@ -478,16 +544,22 @@ export class ThreadService {
                 }
             }
             if (!user.partner_id) {
-                this.notificationService.add(_t("You can only chat with existing users."), {
-                    type: "warning",
-                });
+                this.notificationService.add(
+                    _t("You can only chat with existing users."),
+                    {
+                        type: "warning",
+                    }
+                );
                 return;
             }
             partnerId = user.partner_id;
         }
 
         if (partnerId) {
-            const partner = this.store.Persona.insert({ id: partnerId, type: "partner" });
+            const partner = this.store.Persona.insert({
+                id: partnerId,
+                type: "partner",
+            });
             if (!partner.user) {
                 const [userId] = await this.orm.silent.search(
                     "res.users",
@@ -496,7 +568,9 @@ export class ThreadService {
                 );
                 if (!userId) {
                     this.notificationService.add(
-                        _t("You can only chat with partners that have a dedicated user."),
+                        _t(
+                            "You can only chat with partners that have a dedicated user."
+                        ),
                         { type: "info" }
                     );
                     return;
@@ -516,7 +590,7 @@ export class ThreadService {
             return;
         }
         return Object.values(this.store.Thread.records).find(
-            (thread) => thread.type === "chat" && thread.chatPartner?.eq(partner)
+            thread => thread.type === "chat" && thread.chatPartner?.eq(partner)
         );
     }
 
@@ -535,7 +609,9 @@ export class ThreadService {
         }
         if (!chat) {
             this.notificationService.add(
-                _t("An unexpected error occurred during the creation of the chat."),
+                _t(
+                    "An unexpected error occurred during the creation of the chat."
+                ),
                 { type: "warning" }
             );
             return;
@@ -560,9 +636,14 @@ export class ThreadService {
     }
 
     async joinChat(id) {
-        const data = await this.orm.call("discuss.channel", "channel_get", [], {
-            partners_to: [id],
-        });
+        const data = await this.orm.call(
+            "discuss.channel",
+            "channel_get",
+            [],
+            {
+                partners_to: [id],
+            }
+        );
         const thread = this.store.Thread.insert({
             ...data,
             model: "discuss.channel",
@@ -572,9 +653,14 @@ export class ThreadService {
     }
 
     executeCommand(thread, command, body = "") {
-        return this.orm.call("discuss.channel", command.methodName, [[thread.id]], {
-            body,
-        });
+        return this.orm.call(
+            "discuss.channel",
+            command.methodName,
+            [[thread.id]],
+            {
+                body,
+            }
+        );
     }
 
     /**
@@ -594,27 +680,44 @@ export class ThreadService {
         ) {
             if (thread.type === "channel" || thread.type === "group") {
                 thread.name = newName;
-                await this.orm.call("discuss.channel", "channel_rename", [[thread.id]], {
-                    name: newName,
-                });
+                await this.orm.call(
+                    "discuss.channel",
+                    "channel_rename",
+                    [[thread.id]],
+                    {
+                        name: newName,
+                    }
+                );
             } else if (thread.type === "chat") {
                 thread.custom_channel_name = newName;
-                await this.orm.call("discuss.channel", "channel_set_custom_name", [[thread.id]], {
-                    name: newName,
-                });
+                await this.orm.call(
+                    "discuss.channel",
+                    "channel_set_custom_name",
+                    [[thread.id]],
+                    {
+                        name: newName,
+                    }
+                );
             }
         }
     }
 
     async notifyThreadDescriptionToServer(thread, description) {
         thread.description = description;
-        return this.orm.call("discuss.channel", "channel_change_description", [[thread.id]], {
-            description,
-        });
+        return this.orm.call(
+            "discuss.channel",
+            "channel_change_description",
+            [[thread.id]],
+            {
+                description,
+            }
+        );
     }
 
     async leaveChannel(channel) {
-        await this.orm.call("discuss.channel", "action_unfollow", [channel.id]);
+        await this.orm.call("discuss.channel", "action_unfollow", [
+            channel.id,
+        ]);
         channel.delete();
         this.setDiscussThread(
             this.store.discuss.channels.threads[0]
@@ -671,7 +774,11 @@ export class ThreadService {
             thread,
         });
         const tmpId = this.messageService.getNextTemporaryId();
-        params.context = { ...this.user.context, ...params.context, temporary_id: tmpId };
+        params.context = {
+            ...this.user.context,
+            ...params.context,
+            temporary_id: tmpId,
+        };
         if (parentId) {
             params.post_data.parent_id = parentId;
         }
@@ -701,14 +808,19 @@ export class ThreadService {
                 browser.localStorage.getItem("web.emoji.frequent") || "{}"
             );
             const emojisInContent =
-                prettyContent.match(/\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu) ?? [];
+                prettyContent.match(
+                    /\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu
+                ) ?? [];
             for (const codepoints of emojisInContent) {
-                if (emojis.some((emoji) => emoji.codepoints === codepoints)) {
+                if (emojis.some(emoji => emoji.codepoints === codepoints)) {
                     recentEmojis[codepoints] ??= 0;
                     recentEmojis[codepoints]++;
                 }
             }
-            browser.localStorage.setItem("web.emoji.frequent", JSON.stringify(recentEmojis));
+            browser.localStorage.setItem(
+                "web.emoji.frequent",
+                JSON.stringify(recentEmojis)
+            );
             tmpMsg = this.store.Message.insert(
                 {
                     ...tmpData,
@@ -733,7 +845,11 @@ export class ThreadService {
         const message = this.store.Message.insert(data, { html: true });
         thread.messages.add(message);
         if (!message.isEmpty && this.store.hasLinkPreviewFeature) {
-            this.rpc("/mail/link_preview", { message_id: data.id }, { silent: true });
+            this.rpc(
+                "/mail/link_preview",
+                { message_id: data.id },
+                { silent: true }
+            );
         }
         return message;
     }
@@ -757,15 +873,15 @@ export class ThreadService {
                   mentionedPartners,
               })
             : undefined;
-        const partner_ids = validMentions?.partners.map((partner) => partner.id);
+        const partner_ids = validMentions?.partners.map(partner => partner.id);
         let recipientEmails = [];
         if (!isNote) {
             const recipientIds = thread.suggestedRecipients
-                .filter((recipient) => recipient.persona && recipient.checked)
-                .map((recipient) => recipient.persona.id);
+                .filter(recipient => recipient.persona && recipient.checked)
+                .map(recipient => recipient.persona.id);
             recipientEmails = thread.suggestedRecipients
-                .filter((recipient) => recipient.checked && !recipient.persona)
-                .map((recipient) => recipient.email);
+                .filter(recipient => recipient.checked && !recipient.persona)
+                .map(recipient => recipient.email);
             partner_ids?.push(...recipientIds);
         }
         return {
@@ -775,7 +891,9 @@ export class ThreadService {
             post_data: {
                 body: await prettifyMessageContent(body, validMentions),
                 attachment_ids: attachments.map(({ id }) => id),
-                attachment_tokens: attachments.map((attachment) => attachment.accessToken),
+                attachment_tokens: attachments.map(
+                    attachment => attachment.accessToken
+                ),
                 canned_response_ids: cannedResponseIds,
                 message_type: "comment",
                 partner_ids,
@@ -820,19 +938,27 @@ export class ThreadService {
             return thread.counter;
         }
         if (thread.isChatChannel) {
-            return thread.message_unread_counter || thread.message_needaction_counter;
+            return (
+                thread.message_unread_counter ||
+                thread.message_needaction_counter
+            );
         }
         return thread.message_needaction_counter;
     }
 
     getDiscussSidebarCategoryCounter(categoryId) {
-        return this.store.discuss[categoryId].threads.reduce((acc, channel) => {
-            if (categoryId === "channels") {
-                return channel.message_needaction_counter > 0 ? acc + 1 : acc;
-            } else {
-                return channel.message_unread_counter > 0 ? acc + 1 : acc;
-            }
-        }, 0);
+        return this.store.discuss[categoryId].threads.reduce(
+            (acc, channel) => {
+                if (categoryId === "channels") {
+                    return channel.message_needaction_counter > 0
+                        ? acc + 1
+                        : acc;
+                } else {
+                    return channel.message_unread_counter > 0 ? acc + 1 : acc;
+                }
+            },
+            0
+        );
     }
 
     /**
@@ -871,7 +997,10 @@ export class ThreadService {
         if (persona.write_date) {
             urlParams.unique = persona.write_date;
         }
-        if (persona.is_company === undefined && this.store.self?.user?.isInternalUser) {
+        if (
+            persona.is_company === undefined &&
+            this.store.self?.user?.isInternalUser
+        ) {
             this.personaService.fetchIsCompany(persona);
         }
         if (thread?.model === "discuss.channel") {
@@ -965,12 +1094,20 @@ export class ThreadService {
      */
     _enrichMessagesWithTransient(thread) {
         for (const message of thread.transientMessages) {
-            if (message.id < thread.oldestPersistentMessage && !thread.loadOlder) {
+            if (
+                message.id < thread.oldestPersistentMessage &&
+                !thread.loadOlder
+            ) {
                 thread.messages.unshift(message);
-            } else if (message.id > thread.newestPersistentMessage && !thread.loadNewer) {
+            } else if (
+                message.id > thread.newestPersistentMessage &&
+                !thread.loadNewer
+            ) {
                 thread.messages.push(message);
             } else {
-                let afterIndex = thread.messages.findIndex((msg) => msg.id > message.id);
+                let afterIndex = thread.messages.findIndex(
+                    msg => msg.id > message.id
+                );
                 if (afterIndex === -1) {
                     afterIndex = thread.messages.length + 1;
                 }
@@ -985,11 +1122,14 @@ export class ThreadService {
      * @param {number|false} [before]
      */
     async search(searchTerm, thread, before = false) {
-        const { messages, count } = await this.rpc(this.getFetchRoute(thread), {
-            ...this.getFetchParams(thread),
-            search_term: escape(searchTerm),
-            before,
-        });
+        const { messages, count } = await this.rpc(
+            this.getFetchRoute(thread),
+            {
+                ...this.getFetchParams(thread),
+                search_term: escape(searchTerm),
+                before,
+            }
+        );
         return {
             count,
             loadMore: messages.length === FETCH_LIMIT,

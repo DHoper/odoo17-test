@@ -82,7 +82,8 @@ export class LivechatService {
                 channel_id: this.options.channel_id,
             });
             // Clear session if it is outdated.
-            const prevOdooVersion = browser.localStorage.getItem(ODOO_VERSION_KEY);
+            const prevOdooVersion =
+                browser.localStorage.getItem(ODOO_VERSION_KEY);
             const currOdooVersion = init?.odoo_version;
             const visitorUid = this.visitorUid || false;
             const userId = session.user_id || false;
@@ -116,9 +117,17 @@ export class LivechatService {
         });
         cookie.delete(this.SESSION_COOKIE);
         cookie.delete(this.OPERATOR_COOKIE);
-        cookie.set(this.SESSION_COOKIE, JSON.stringify(session).replaceAll("→", " "), 60 * 60 * 24); // 1 day cookie.
+        cookie.set(
+            this.SESSION_COOKIE,
+            JSON.stringify(session).replaceAll("→", " "),
+            60 * 60 * 24
+        ); // 1 day cookie.
         if (session?.operator_pid) {
-            cookie.set(this.OPERATOR_COOKIE, session.operator_pid[0], 7 * 24 * 60 * 60); // 1 week cookie.
+            cookie.set(
+                this.OPERATOR_COOKIE,
+                session.operator_pid[0],
+                7 * 24 * 60 * 60
+            ); // 1 week cookie.
         }
     }
 
@@ -133,7 +142,9 @@ export class LivechatService {
         try {
             if (session?.uuid && notifyServer) {
                 this.busService.deleteChannel(session.uuid);
-                await this.rpc("/im_livechat/visitor_leave_session", { uuid: session.uuid });
+                await this.rpc("/im_livechat/visitor_leave_session", {
+                    uuid: session.uuid,
+                });
             }
         } finally {
             cookie.delete(this.SESSION_COOKIE);
@@ -153,14 +164,15 @@ export class LivechatService {
             return this.thread;
         }
         this.persistThreadPromise =
-            this.persistThreadPromise ?? this.getOrCreateThread({ persist: true });
+            this.persistThreadPromise ??
+            this.getOrCreateThread({ persist: true });
         try {
             await this.persistThreadPromise;
         } finally {
             this.persistThreadPromise = null;
         }
         const chatWindow = this.store.discuss.chatWindows.find(
-            (c) => c.thread.id === this.TEMPORARY_ID
+            c => c.thread.id === this.TEMPORARY_ID
         );
         if (chatWindow) {
             chatWindow.thread?.delete();
@@ -170,7 +182,9 @@ export class LivechatService {
             }
             chatWindow.thread = this.thread;
             if (this.env.services["im_livechat.chatbot"].active) {
-                await this.env.services["im_livechat.chatbot"].postWelcomeSteps();
+                await this.env.services[
+                    "im_livechat.chatbot"
+                ].postWelcomeSteps();
             }
         }
         return this.thread;
@@ -185,15 +199,15 @@ export class LivechatService {
         let threadData = this.sessionCookie;
         let isNewlyCreated = false;
         if (!threadData || (!threadData.uuid && persist)) {
-            const chatbotScriptId = this.sessionCookie
+            /*   const chatbotScriptId = this.sessionCookie
                 ? this.sessionCookie.chatbot_script_id
-                : this.rule.chatbot?.scriptId;
+                : this.rule.chatbot?.scriptId; */
             threadData = await this.rpc(
                 "/im_livechat/get_session",
                 {
                     channel_id: this.options.channel_id,
                     anonymous_name: this.userName,
-                    chatbot_script_id: chatbotScriptId,
+                    chatbot_script_id: null,
                     previous_operator_id: cookie.get(this.OPERATOR_COOKIE),
                     persisted: persist,
                 },
@@ -202,12 +216,17 @@ export class LivechatService {
             isNewlyCreated = true;
         }
         if (!threadData?.operator_pid) {
-            this.notificationService.add(_t("No available collaborator, please try again later."));
+            this.notificationService.add(
+                _t("No available collaborator, please try again later.")
+            );
             this.leaveSession({ notifyServer: false });
             return;
         }
         if ("guest_token" in threadData) {
-            localStorage.setItem(this.GUEST_TOKEN_STORAGE_KEY, threadData.guest_token);
+            localStorage.setItem(
+                this.GUEST_TOKEN_STORAGE_KEY,
+                threadData.guest_token
+            );
             delete threadData.guest_token;
         }
         this.updateSession(threadData);
@@ -219,8 +238,13 @@ export class LivechatService {
             type: "livechat",
             isNewlyCreated,
         });
-        this.state = thread.uuid ? SESSION_STATE.PERSISTED : SESSION_STATE.CREATED;
-        if (this.state === SESSION_STATE.PERSISTED && !this.sessionInitialized) {
+        this.state = thread.uuid
+            ? SESSION_STATE.PERSISTED
+            : SESSION_STATE.CREATED;
+        if (
+            this.state === SESSION_STATE.PERSISTED &&
+            !this.sessionInitialized
+        ) {
             this.sessionInitialized = true;
             await this.initializePersistedSession();
         }
@@ -264,7 +288,8 @@ export class LivechatService {
     get thread() {
         return Object.values(this.store.Thread.records).find(
             ({ id, type }) =>
-                type === "livechat" && id === (this.sessionCookie?.id ?? this.TEMPORARY_ID)
+                type === "livechat" &&
+                id === (this.sessionCookie?.id ?? this.TEMPORARY_ID)
         );
     }
 

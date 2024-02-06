@@ -1,6 +1,9 @@
 /* @odoo-module */
 
-import { ThreadService, threadService } from "@mail/core/common/thread_service";
+import {
+    ThreadService,
+    threadService,
+} from "@mail/core/common/thread_service";
 
 import { patch } from "@web/core/utils/patch";
 import { url } from "@web/core/utils/urls";
@@ -25,7 +28,10 @@ patch(ThreadService.prototype, {
      * @returns {Promise<import("models").Message}
      */
     async post(thread, body, params) {
-        thread = thread.type === "livechat" ? await this.livechatService.persistThread() : thread;
+        thread =
+            thread.type === "livechat"
+                ? await this.livechatService.persistThread()
+                : thread;
         if (!thread) {
             return;
         }

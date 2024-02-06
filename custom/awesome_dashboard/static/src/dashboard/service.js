@@ -38,6 +38,7 @@ export const mailCoreCommon = {
     start(env, services) {
         const mailCoreCommon = reactive(new MailCoreCommon(env, services));
         mailCoreCommon.setup();
+        console.log(env,124454);
         return mailCoreCommon;
     },
 };

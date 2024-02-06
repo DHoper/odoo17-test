@@ -19,7 +19,7 @@ export class HistoryService {
 
     setup() {
         this.updateHistory();
-        this.busService.subscribe("im_livechat.history_command", (payload) => {
+        this.busService.subscribe("im_livechat.history_command", payload => {
             if (payload.id !== this.livechatService.thread?.id) {
                 return;
             }
@@ -60,4 +60,6 @@ export const historyService = {
     },
 };
 
-registry.category("services").add("im_livechat.history_service", historyService);
+registry
+    .category("services")
+    .add("im_livechat.history_service", historyService);

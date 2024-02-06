@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tutorTalk.Root">
+        <Router>
+            <t t-set-slot="member_register" route="`/tutoringCentre/member_register`">
+                <MemberRegister />
+            </t>
+            <t t-set-slot="home" route="`/tutoringCentre/chat_window`">
+                <ChatWindow />
+            </t>
+        </Router>
+    </t>
+</templates>

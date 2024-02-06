@@ -23,7 +23,7 @@ export class DiscussCoreWeb {
     }
 
     setup() {
-        this.messagingService.isReady.then((data) => {
+        this.messagingService.isReady.then(data => {
             this.store.discuss.channels.isOpen =
                 data.current_user_settings.is_discuss_sidebar_category_channel_open;
             this.store.discuss.chats.isOpen =
@@ -36,7 +36,10 @@ export class DiscussCoreWeb {
                 if (this.ui.isSmall || message.isSelfAuthored) {
                     return;
                 }
-                if (channel.correspondent?.eq(this.store.odoobot) && this.store.odoobotOnboarding) {
+                if (
+                    channel.correspondent?.eq(this.store.odoobot) &&
+                    this.store.odoobotOnboarding
+                ) {
                     // this cancels odoobot onboarding auto-opening of chat window
                     this.store.odoobotOnboarding = false;
                     return;
@@ -44,7 +47,7 @@ export class DiscussCoreWeb {
                 this.threadService.notifyMessageToUser(channel, message);
             }
         );
-        this.busService.subscribe("res.users.settings", (payload) => {
+        this.busService.subscribe("res.users.settings", payload => {
             if (payload) {
                 this.store.discuss.chats.isOpen =
                     payload.is_discuss_sidebar_category_chat_open ??
@@ -54,32 +57,41 @@ export class DiscussCoreWeb {
                     this.store.discuss.channels.isOpen;
             }
         });
-        this.busService.subscribe("res.users/connection", async ({ partnerId, username }) => {
-            // If the current user invited a new user, and the new user is
-            // connecting for the first time while the current user is present
-            // then open a chat for the current user with the new user.
-            const notification = _t(
-                "%(user)s connected. This is their first connection. Wish them luck.",
-                { user: username }
-            );
-            this.notificationService.add(notification, { type: "info" });
-            const chat = await this.threadService.getChat({ partnerId });
-            if (chat && !this.ui.isSmall) {
-                this.store.ChatWindow.insert({ thread: chat });
+        this.busService.subscribe(
+            "res.users/connection",
+            async ({ partnerId, username }) => {
+                // If the current user invited a new user, and the new user is
+                // connecting for the first time while the current user is present
+                // then open a chat for the current user with the new user.
+                const notification = _t(
+                    "%(user)s connected. This is their first connection. Wish them luck.",
+                    { user: username }
+                );
+                this.notificationService.add(notification, { type: "info" });
+                const chat = await this.threadService.getChat({ partnerId });
+                if (chat && !this.ui.isSmall) {
+                    this.store.ChatWindow.insert({ thread: chat });
+                }
             }
-        });
-        this.busService.subscribe("discuss.Thread/fold_state", (data) => {
+        );
+        this.busService.subscribe("discuss.Thread/fold_state", data => {
             const thread = this.store.Thread.get(data);
-            if (data.fold_state && thread && data.foldStateCount > thread.foldStateCount) {
+            if (
+                data.fold_state &&
+                thread &&
+                data.foldStateCount > thread.foldStateCount
+            ) {
                 thread.foldStateCount = data.foldStateCount;
                 if (data.fold_state !== thread.state) {
                     thread.state = data.fold_state;
                     if (thread.state === "closed") {
-                        const chatWindow = this.store.discuss.chatWindows.find((chatWindow) =>
-                            chatWindow.thread?.eq(thread)
+                        const chatWindow = this.store.discuss.chatWindows.find(
+                            chatWindow => chatWindow.thread?.eq(thread)
                         );
                         if (chatWindow) {
-                            this.chatWindowService.close(chatWindow, { notifyState: false });
+                            this.chatWindowService.close(chatWindow, {
+                                notifyState: false,
+                            });
                         }
                     } else {
                         this.store.ChatWindow.insert({
