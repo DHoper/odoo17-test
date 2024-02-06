@@ -8,7 +8,7 @@ export class MemberRegister extends Component {
     setup() {
         this.rpc = useService("rpc");
         this.router = useService("tutoringCentre_router");
-        this.memberService = useService("TutoringCentreMember");
+        this.memberService = useState(useService("tutoringCentre_member"));
         this.state = useState({
             studentName: "",
             birthDate: null,

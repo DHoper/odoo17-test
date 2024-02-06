@@ -5,7 +5,6 @@ import { getColor } from "@web/core/colors/colors";
 import { Component, useState, useEffect, useRef } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
-import { userService } from "@web/core/user_service";
 
 export class ChatWindow extends Component {
     static template = "tutorTalk.ChatWindow";
@@ -14,7 +13,7 @@ export class ChatWindow extends Component {
         this.rpc = useService("rpc");
         this.liveChat = useState(useService("TutoringCentreLiveChat"));
         this.userName = _t("Visitor");
-        // this.live = userService("im_livechat.livechat");
+        this.member = useState(useService("tutoringCentre_member"));
         this.channelInfo;
         this.textarea = useRef("textarea");
         this.state = useState({
@@ -60,7 +59,19 @@ export class ChatWindow extends Component {
 
         return `${timePart}`;
     }
-
+    async parentPick() {
+        console.log(this.member.memberInfo, 56464);
+        const response = await this.rpc(
+            "/tutoringCentre/TutorTalk/api/parentPickup",
+            {
+                childName: this.member.memberInfo.student.name,
+            }
+        );
+        if (response) {
+            alert("已成功通知補習班!");
+        }
+        console.log(response, 4542141);
+    }
     async onClickSendMessage() {
         this.liveChat.sendMessage(this.state.text);
         this.state.text = "";

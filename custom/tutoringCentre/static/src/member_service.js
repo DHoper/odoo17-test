@@ -16,25 +16,25 @@ export class TutoringCentreMember {
 
     setup() {
         this.user;
-        this.member;
+        this.memberInfo;
         this.state = reactive({
             registration: false,
         });
 
-        // this.init();
+        this._init();
     }
 
-    async init() {
+    async _init() {
         this.user = await this.rpc("/tutoringCentre/api/userInfo");
 
         if (!this.user || !this.user.active)
             browser.location.assign("/web/login?redirect=/tutoringCentre");
 
-        this.member = await this.rpc("/tutoringCentre/api/memberInfo", {
+        this.memberInfo = await this.rpc("/tutoringCentre/api/memberInfo", {
             userID: this.user.id,
         });
 
-        if (!this.member) {
+        if (!this.memberInfo) {
             this.state.registration = false;
             this.router.navigate("member_register");
         } else {
@@ -55,4 +55,4 @@ export const tutoringCentreMember = {
 };
 registry
     .category("services")
-    .add("TutoringCentreMember", tutoringCentreMember);
+    .add("tutoringCentre_member", tutoringCentreMember);

@@ -20,7 +20,7 @@ export class Root extends Component {
         onWillStart(() => this.registerServiceWorker());
         this.rpc = useService("rpc");
         this.router = useService("tutoringCentre_router");
-        this.memberService = useState(useService("TutoringCentreMember"));
+        this.memberService = useState(useService("tutoringCentre_member"));
         // this.state = useState({
         //     routerComponent: ChatWindow,
         // });
@@ -29,7 +29,7 @@ export class Root extends Component {
         //     changeRoute: this.changeRoute.bind(this),
         // };
 
-        await this.memberService.init();
+        // await this.memberService.init();
 
         // if (!this.memberService.state.registration) {
         //     this.state.routerComponent = MemberRegister;

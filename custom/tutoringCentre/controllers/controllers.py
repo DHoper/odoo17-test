@@ -7,6 +7,8 @@ from odoo.exceptions import UserError
 from werkzeug.exceptions import NotFound
 import logging
 import paho.mqtt.publish as publish
+import paho.mqtt.client as mqtt
+import threading
 
 _logger = logging.getLogger(__name__)
 
@@ -65,6 +67,10 @@ class TutoringCentreController(Controller):
         if not memberTuple:
             return False
         member_values = {field: memberTuple[field] for field in memberTuple._fields}
+        student_values = {
+            field: memberTuple.student[field] for field in memberTuple.student._fields
+        }
+        member_values["student"] = student_values
         return member_values
 
     def _get_guest_name(self):
@@ -224,24 +230,48 @@ class TutoringCentreController(Controller):
         else:
             return {"success": False, "error": _("Invalid LiveChat channel")}
 
-    @route(
-        "/tutoringCentre/TutorTalk/api/parentPickup",
-        type="json",
-        auth="user",
-    )
-    def send_message_to_mqtt(self, childName):
-        # 指定樹莓派 MQTT Broker 的地址和連接埠
-        mqtt_broker_address = "172.16.162.41"
-        mqtt_broker_port = 1883
+    # @route(
+    #     "/tutoringCentre/TutorTalk/api/parentPickup",
+    #     type="json",
+    #     auth="user",
+    # )
+    # def send_message_to_mqtt(self, childName):
+    #     hostname = "172.16.162.41"
+    #     port = 1883
 
-        # 發佈的主題和消息
-        topic = "tutoringCentre/parentPickup"
-        message_to_publish = "王小名"
+    #     client = mqtt.Client()
 
-        # 使用 Paho MQTT Client 發佈消息
-        publish.single(
-            topic,
-            message_to_publish,
-            hostname=mqtt_broker_address,
-            port=mqtt_broker_port,
-        )
+    #     # 設置訂閱和處理消息的函數
+    #     def on_connect(client, userData, flags, rc):
+    #         client.subscribe(confirmation_topic, qos=1)
+
+    #     def on_message(client, userData, message):
+    #         if message.topic == confirmation_topic:
+    #             userData["message"] = message.payload.decode()
+    #             event.set()
+
+    #     confirmation_topic = "tutoringCentre/parentPickup/confirmation"
+    #     event = threading.Event()
+    #     userData = {"message": None}
+
+    #     client.user_data_set(userData)
+    #     client.on_connect = on_connect
+    #     client.on_message = on_message
+
+    #     client.connect(hostname, port)
+    #     client.loop_start()  # 開始訂閱和處理消息
+
+    #     topic = "tutoringCentre/parentPickup/childName"
+    #     client.publish(topic, childName, qos=1)  # 發布訊息
+
+    #     # 等待確認訊息，最多 5 秒
+    #     event.wait(timeout=15)
+
+    #     # 檢查是否收到了確認訊息，如果是，立即返回確認訊息
+    #     if userData["message"] is not None:
+    #         client.loop_stop()  # 停止訂閱和處理消息
+    #         return userData["message"]
+
+    #     # 如果沒有收到確認訊息，返回 False
+    #     client.loop_stop()  # 停止訂閱和處理消息
+    #     return False
