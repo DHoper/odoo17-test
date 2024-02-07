@@ -17,7 +17,11 @@ class MqttClient(Controller):
         self.client = mqtt.Client()
 
         def on_connect(client, userData, flags, rc):
-            client.subscribe(self.confirmation_topic, qos=1)
+            if rc == 0:
+                _logger.info("MQTT Client connected successfully.")
+                client.subscribe(self.confirmation_topic, qos=1)
+            else:
+                _logger.error(f"Failed to connect to MQTT Broker. Error code: {rc}")
 
         def on_message(client, userData, message):
             if message.topic == self.confirmation_topic:
@@ -26,7 +30,7 @@ class MqttClient(Controller):
                 if message_id in self.api_calls:
                     self.api_calls[message_id].set()
             else:
-                print(
+                _logger.info(
                     f"Received message from topic: {message.topic}: {message.payload}"
                 )
                 # 關聯API
@@ -35,7 +39,7 @@ class MqttClient(Controller):
                 client.publish(
                     "tutoringCentre/parentPickup/confirmation", message_id, qos=1
                 )
-                print("Confirmation message published")
+                _logger.info("Confirmation message published")
 
         self.confirmation_topic = "tutoringCentre/parentPickup/confirmation"
         self.api_calls = {}
@@ -44,8 +48,11 @@ class MqttClient(Controller):
         self.client.on_connect = on_connect
         self.client.on_message = on_message
 
-        self.client.connect(self.hostname, self.port)
-        self.client.loop_start()  # 开始订阅和处理消息
+        try:
+            self.client.connect(self.hostname, self.port)
+            self.client.loop_start() 
+        except Exception as e:
+            _logger.error(f"Error connecting to MQTT Broker: {e}")
 
     @route(
         "/tutoringCentre/TutorTalk/api/parentPickup",

@@ -2,10 +2,10 @@
 <templates xml:space="preserve">
     <t t-name="tutorTalk.Root">
         <Router>
-            <t t-set-slot="member_register" route="`/tutoringCentre/member_register`">
+            <t t-set-slot="member_register" route="`/tutoringCentre/app/member_register`">
                 <MemberRegister />
             </t>
-            <t t-set-slot="home" route="`/tutoringCentre/chat_window`">
+            <t t-set-slot="home" route="`/tutoringCentre/app/chat_window`">
                 <ChatWindow />
             </t>
         </Router>

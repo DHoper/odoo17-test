@@ -11,7 +11,7 @@ export class ChatWindow extends Component {
 
     setup() {
         this.rpc = useService("rpc");
-        this.liveChat = useState(useService("TutoringCentreLiveChat"));
+        this.liveChat = useService("tutoringCentre_liveChat");
         this.userName = _t("Visitor");
         this.member = useState(useService("tutoringCentre_member"));
         this.channelInfo;
@@ -19,6 +19,9 @@ export class ChatWindow extends Component {
         this.state = useState({
             channelMessages: this.liveChat.channelMessages,
             text: "",
+            parentPickLoading: false,
+            parentPickShowPop: false,
+            parentPickPopText: "",
         });
 
         useEffect(
@@ -60,7 +63,8 @@ export class ChatWindow extends Component {
         return `${timePart}`;
     }
     async parentPick() {
-        console.log(this.member.memberInfo, 56464);
+        console.log(7788, this.member.memberInfo, 7878787);
+        this.state.parentPickLoading = true;
         const response = await this.rpc(
             "/tutoringCentre/TutorTalk/api/parentPickup",
             {
@@ -68,9 +72,15 @@ export class ChatWindow extends Component {
             }
         );
         if (response) {
-            alert("已成功通知補習班!");
+            this.state.parentPickLoading = false;
+            this.state.parentPickPopText = "通知成功，請前往接送小朋友。";
+            document.getElementById("parentPick").showModal();
+        } else {
+            this.state.parentPickLoading = true;
+            this.state.parentPickPopText =
+                "通知失敗，請再嘗試一次，或聯絡客服人員。";
+            document.getElementById("parentPick").showModal();
         }
-        console.log(response, 4542141);
     }
     async onClickSendMessage() {
         this.liveChat.sendMessage(this.state.text);

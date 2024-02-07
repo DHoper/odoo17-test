@@ -30,9 +30,13 @@ export class TutoringCentreMember {
         if (!this.user || !this.user.active)
             browser.location.assign("/web/login?redirect=/tutoringCentre");
 
+        console.log(23137, this.user);
+
         this.memberInfo = await this.rpc("/tutoringCentre/api/memberInfo", {
             userID: this.user.id,
         });
+
+        console.log(78977777, this.userInfo, this.memberInfo);
 
         if (!this.memberInfo) {
             this.state.registration = false;

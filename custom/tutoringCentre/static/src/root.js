@@ -9,7 +9,7 @@ import {
 import { useService } from "@web/core/utils/hooks";
 import { browser } from "@web/core/browser/browser";
 import { ChatWindow } from "./TutorTalk/ChatWindow/ChatWindow";
-import { MemberRegister } from "./component/Member_register";
+import { MemberRegister } from "./pages/Member_register";
 import { Router } from "./router";
 
 export class Root extends Component {
@@ -52,7 +52,7 @@ export class Root extends Component {
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker
                 .register("/tutoringCentre/service-worker", {
-                    scope: "/tutoringCentre",
+                    scope: "/tutoringCentre/app",
                 })
                 .then(registration => {
                     if (Notification.permission !== "granted") {

@@ -36,29 +36,26 @@ export class TutoringCentreLiveChat {
                 "/web/login?redirect=/tutoringCentre/TutorTalk"
             );
         this.userName = this.user.name;
+        // browser.localStorage.removeItem("tutorTalk_channelInfo");
 
+        // 嘗試獲取本地端頻道資訊
         const localChannelInfo = browser.localStorage.getItem(
             "tutorTalk_channelInfo"
         );
 
         if (localChannelInfo) {
             this.channelInfo = JSON.parse(localChannelInfo);
-            console.log(this.channelInfo, 65);
             this.channel = await this.rpc(
                 "/tutoringCentre/TutorTalk/api/livechat/fetchChannel",
                 { channel_uuid: this.channelInfo.uuid }
             );
-
-            if (this.channel) console.log(this.channel, 1111);
         }
 
-        console.log(this.channelInfo, 1232, this.channel);
         if (
             !this.channelInfo ||
             !this.channel ||
-            this.channel.create_uid !== this.user.partner_id.id
+            !this.channel.channel_partner_ids.includes(this.user.partner_id[0])
         ) {
-            console.log(777);
             const { channel_info, channel } = await this.rpc(
                 "/tutoringCentre/TutorTalk/api/livechat/buildChat",
                 {
@@ -71,10 +68,13 @@ export class TutoringCentreLiveChat {
                 { shadow: true }
             );
 
-            browser.localStorage.setItem(
-                "tutorTalk_channelInfo",
-                JSON.stringify(channel_info)
-            );
+            console.log(channel_info, "頻道", channel);
+            if (channel_info) {
+                browser.localStorage.setItem(
+                    "tutorTalk_channelInfo",
+                    JSON.stringify(channel_info)
+                );
+            }
 
             this.channelInfo = channel_info;
             this.channel = channel;
@@ -82,9 +82,8 @@ export class TutoringCentreLiveChat {
 
         this.channel_id = this.channelInfo.id;
         this.uuid = this.channelInfo.uuid;
-        console.log("頻道已建立", this.channelInfo, this.user);
 
-        this.busService.addChannel(this.channel);
+        this.busService.addChannel(`${this.channel.id}`);
         this.busService.subscribe("discuss.channel/new_message", payload => {
             if (payload.id !== this.channel_id) return;
             this.channelMessages.push(payload.message);
@@ -92,7 +91,6 @@ export class TutoringCentreLiveChat {
     }
 
     onMessage({ detail: notifications }) {
-        console.log(notifications, 123);
         notifications = notifications.filter(
             item => item.payload.channel === this.channel
         );
@@ -100,14 +98,10 @@ export class TutoringCentreLiveChat {
 
     async sendMessage(text) {
         if (!this.channelInfo.uuid) return;
-        const info = await this.rpc(
-            "/tutoringCentre/TutorTalk/api/livechat/send_message",
-            {
-                channel_uuid: this.channelInfo.uuid,
-                message: text,
-            }
-        );
-        console.log("訊息已發送", info);
+        await this.rpc("/tutoringCentre/TutorTalk/api/livechat/send_message", {
+            channel_uuid: this.channelInfo.uuid,
+            message: text,
+        });
     }
 }
 
@@ -123,4 +117,4 @@ export const tutoringCentreLiveChat = {
 };
 registry
     .category("services")
-    .add("TutoringCentreLiveChat", tutoringCentreLiveChat);
+    .add("tutoringCentre_liveChat", tutoringCentreLiveChat);

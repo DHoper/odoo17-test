@@ -12,6 +12,7 @@ export class MemberRegister extends Component {
         this.state = useState({
             studentName: "",
             birthDate: null,
+            step: 0,
         });
     }
 

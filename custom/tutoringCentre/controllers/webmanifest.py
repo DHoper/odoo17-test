@@ -17,8 +17,8 @@ class TutoringCentreManifest(http.Controller):
     def webmanifest(self):
         manifest = {
             "name": "補習班平台",
-            "scope": "/tutoringCentre",
-            "start_url": "/tutoringCentre",
+            "scope": "/tutoringCentre/app",
+            "start_url": "/tutoringCentre/app",
             "display": "standalone",
             "background_color": "#714B67",
             "theme_color": "#714B67",
@@ -27,7 +27,7 @@ class TutoringCentreManifest(http.Controller):
         icon_sizes = ["192x192", "512x512"]
         manifest["icons"] = [
             {
-                "src": "/tutoringCentre/static/img/icon.png",
+                "src": "/tutoringCentre/static/src/img/icon.png",
                 "sizes": size,
                 "type": "image/png",
             }
@@ -53,7 +53,7 @@ class TutoringCentreManifest(http.Controller):
             self._get_service_worker_content(),
             [
                 ("Content-Type", "text/javascript"),
-                ("Service-Worker-Allowed", "/tutoringCentre"),
+                ("Service-Worker-Allowed", "/tutoringCentre/app"),
             ],
         )
         return response
