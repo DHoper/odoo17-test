@@ -5,7 +5,6 @@ import { session } from "@web/session";
 import { registry } from "@web/core/registry";
 import { browser } from "@web/core/browser/browser";
 // import { _t } from "@web/core/l10n/translation";
-
 export class TutoringCentreMember {
     constructor(env, services) {
         this.env = env;
@@ -14,34 +13,41 @@ export class TutoringCentreMember {
         this.router = services["tutoringCentre_router"];
     }
 
-    setup() {
+    async setup() {
         this.user;
         this.memberInfo;
         this.state = reactive({
             registration: false,
         });
-
-        this._init();
+        await this._init();
     }
 
     async _init() {
         this.user = await this.rpc("/tutoringCentre/api/userInfo");
-
+        console.log(this.user, "member");
         if (!this.user || !this.user.active)
-            browser.location.assign("/web/login?redirect=/tutoringCentre");
-
-        console.log(23137, this.user);
-
+            browser.location.assign("/web/login?redirect=/tutoringCentre/");
         this.memberInfo = await this.rpc("/tutoringCentre/api/memberInfo", {
             userID: this.user.id,
         });
+        if (!this.memberInfo || !this.memberInfo.is_active) {
+            const aa = await this.rpc("/web/session/get_session_info");
+            console.log(aa);
+            await this.rpc("/web/session/destroy");
+            browser.location.assign("/web/login?redirect=/tutoringCentre/");
+        }
 
-        console.log(78977777, this.userInfo, this.memberInfo);
-
+        //以下暫棄
         if (!this.memberInfo) {
             this.state.registration = false;
-            this.router.navigate("member_register");
+            setTimeout(() => {
+                this.router.navigate("member_register", { accessible: true }); // 待解決--async問題
+            }, 700);
         } else {
+            this.memberInfo.portal_user = parseInt(
+                this.memberInfo.portal_user
+            );
+
             this.state.registration = true;
         }
     }
@@ -49,11 +55,11 @@ export class TutoringCentreMember {
 
 export const tutoringCentreMember = {
     dependencies: ["rpc", "bus_service", "tutoringCentre_router"],
-    start(env, services) {
+    async start(env, services) {
         const tutoringCentreMember = reactive(
             new TutoringCentreMember(env, services)
         );
-        tutoringCentreMember.setup(env, services);
+        await tutoringCentreMember.setup(env, services);
         return tutoringCentreMember;
     },
 };

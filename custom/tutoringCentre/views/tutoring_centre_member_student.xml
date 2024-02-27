@@ -11,10 +11,9 @@
         <field name="model">tutoring_centre.member_student</field>
         <field name="arch" type="xml">
             <tree string="目前尚無資料">
-                <!-- <field name="parent"/> -->
                 <field name="name"/>
                 <field name="birthdate"/>
-                <!-- <field name="portal_user"/> -->
+                <field name="courses"/>
             </tree>
         </field>
     </record>
@@ -30,25 +29,29 @@
                         <form>
                             <div class="d-flex flex-column gap-3">
                                 <div class="d-flex flex-row justify-content-between gap-5 px-0">
-                                    <div class="col-md-6 flex-fill">
-                                        <!-- <label for="parent" class="form-label me-2">家長</label> -->
-                                        <!-- <field name="parent"/> -->
-                                    </div>
-                                    <div class="col-md-6 flex-fill">
+                                    <div>
                                         <label for="name" class="form-label me-2">姓名</label>
                                         <field name="name"/>
                                     </div>
-                                </div>
-
-                                <div class="d-flex flex-column gap-3">
-                                    <div class="mb-3">
+                                    <div>
                                         <label for="birthdate" class="form-label">生日</label>
                                         <div>
                                             <field name="birthdate" class="form-control w-100"/>
                                         </div>
                                     </div>
                                 </div>
-
+                                <div class="flex-fill d-flex flex-column gap-3">
+                                    <div class="mb-3">
+                                        <label for="courses" class="form-label me-2">班級</label>
+                                        <field name="courses"/>
+                                    </div>
+                                </div>
+                                <div class="flex-fill d-flex flex-column gap-3">
+                                    <div class="mb-3">
+                                        <label for="active_channels" class="form-label me-2">班級</label>
+                                        <field name="active_channels"/>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>

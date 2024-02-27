@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="tutorTalk.ChatWindow">
-        <div class="flex flex-col items-center flex-shrink-0 rounded-2xl h-screen">
+        <div class="flex flex-col items-center flex-shrink-0 rounded-2xl w-full h-screen bg-white shadow">
             <div class="navbar bg-base-100 dark:bg-white border-b">
                 <div class="flex-none">
-                    <button class="btn btn-square btn-ghost focus:shadow-none">
+                    <button class="btn btn-square btn-ghost focus:shadow-none" t-on-click="props.close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                         </svg>
@@ -13,14 +13,17 @@
                 <div class="flex-1 ml-2">
                     <div class="avatar">
                         <div class="w-10 rounded">
-                            <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                            <img t-if="props.channel_info.image" t-attf-src="data:image/png;base64,{{ props.channel_info.image }}" />
+                            <img t-else="" src="/tutoringCentre/static/src/img/livechat-channel.png" alt=""/>
                         </div>
                     </div>
                     <div class="ml-3">
-                        <p class="text-lg font-semibold">小六衝刺班</p>
+                        <p class="text-lg font-semibold">
+                            <t t-esc="props.channel_info.name" />
+                        </p>
                         <p class="text-sm text-gray-500">國高中美語先修</p>
                     </div>
-                    <div class="mx-auto">
+                    <div t-if="state.in_livechat" class="mx-auto">
                         <button t-if="!state.parentPickLoading" t-on-click="parentPick" class="btn btn-sm btn-outline btn-info focus:shadow-none">
                         MCall
                         </button>
@@ -64,10 +67,10 @@
                 </div>
             </dialog>
 
-            <div t-if="this.sanitizedMessages.length > 0" class="flex flex-col overflow-y-auto w-full p-2 bg-white z-0">
-                <t t-foreach="this.sanitizedMessages" t-as="message" t-key="message.id">
+            <div t-if="this.state.channelMessages.length > 0" class="flex flex-col overflow-y-auto scrollbar-hide w-full p-2 bg-white">
+                <t t-foreach="this.state.channelMessages" t-as="message" t-key="message.id">
                     <div class="message p-2 sm:p-0 mb-2 rounded">
-                        <t t-if="message.author.user.id != liveChat.user.id and message.author.user.login != 'public'">
+                        <t t-if="message.author.user.id != member.memberInfo.portal_user and message.author.user.login != 'public'">
                             <div class="chat chat-start">
                                 <div class="chat-image avatar">
                                     <div class="w-10 rounded-full">
@@ -78,11 +81,11 @@
                                     <span t-esc="message.author.name"/>
                                 </div>
                                 <div class="chat-bubble chat-bubble-info">
-                                    <t t-esc="message.sanitizedBody" class="mt-1"/>
+                                    <t t-out="message.body" class="mt-1"/>
                                 </div>
                                 <div class="chat-footer flex text-slate-500 gap-2 mt-1">
                                     <time class="text-xs">
-                                        <span t-esc="timeFormat(message.write_date)"/>
+                                        <span t-esc="message.write_date"/>
                                     </time>
                                     <span class="text-xs">已傳送</span>
                                 </div>
@@ -91,11 +94,11 @@
                         <t t-else="">
                             <div class="chat chat-end">
                                 <div class="chat-bubble chat-bubble-success">
-                                    <t t-esc="message.sanitizedBody" class="mt-1"/>
+                                    <t t-out="message.body" class="mt-1"/>
                                 </div>
                                 <div class="chat-footer flex text-slate-500 gap-2 mt-1">
                                     <time class="text-xs">
-                                        <span t-esc="timeFormat(message.write_date)"/>
+                                        <span t-esc="message.write_date"/>
                                     </time>
                                     <span class="text-xs">已讀</span>
                                 </div>
@@ -105,7 +108,7 @@
                 </t>
             </div>
 
-            <div class="flex items-center w-full bg-white p-4 mt-auto border-t">
+            <div t-if="state.in_livechat" class="flex items-center w-full bg-white p-4 mt-auto border-t">
                 <textarea t-model="state.text" t-ref="textarea" t-on-input="autoResize" class="dark:bg-white flex-1 h-10 px-4 py-2 text-sm border border-gray-300 rounded-full scrollbar-hide focus:outline-none" rows="1"></textarea>
                 <button t-on-click="onClickSendMessage" class="flex-shrink-0 ml-4 p-2 text-white bg-indigo-500 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">

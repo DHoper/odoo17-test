@@ -3,29 +3,43 @@ import { Component, onWillStart, useState, useEffect } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class MemberRegister extends Component {
-    static template = "tutorTalk.member_register";
-    static props = {};
-    setup() {
-        this.rpc = useService("rpc");
+    static template = "tutoringCentre.Member_register";
+    static props = ["accessible"];
+    async setup() {
         this.router = useService("tutoringCentre_router");
-        this.memberService = useState(useService("tutoringCentre_member"));
+        this.rpc = useService("rpc");
+        // this.memberService = useState(useService("tutoringCentre_member"));
+        this.user;
         this.state = useState({
             studentName: "",
             birthDate: null,
             step: 0,
         });
+
+        onWillStart(async () => {
+            if (!this.props.accessible) {
+                this.router.navigate("default");
+            }
+            this.router.bottomNav = false;
+            this.user = await this.rpc("/tutoringCentre/api/userInfo");
+        });
     }
 
     async submitForm() {
+        const im_channels = await this.rpc(
+            "/tutoringCentre/api/tutorTalk/livechat/fetch_channels"
+        );
+        const course_ids = [7];
+        const channel_ids = [];
+
         const response = await this.rpc("/tutoringCentre/api/createMember", {
-            userID: this.memberService.user.id,
             studentName: this.state.studentName,
+            course_ids: course_ids,
+            channel_ids: channel_ids,
         });
         if (response) {
-            this.memberService.state.registration = true;
-            this.router.navigate("home");
+            this.router.navigate("default");
         } else {
-            this.memberService.state.registration = false;
             alert("未成功!");
         }
     }

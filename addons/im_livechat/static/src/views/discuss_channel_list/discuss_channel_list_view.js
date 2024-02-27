@@ -10,4 +10,6 @@ const discussChannelListView = {
     Controller: DiscussChannelListController,
 };
 
-registry.category("views").add("im_livechat.discuss_channel_list", discussChannelListView);
+registry
+    .category("views")
+    .add("im_livechat.discuss_channel_list", discussChannelListView);

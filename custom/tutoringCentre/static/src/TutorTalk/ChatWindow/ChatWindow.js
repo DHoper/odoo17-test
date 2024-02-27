@@ -2,26 +2,50 @@
 
 import { loadJS } from "@web/core/assets";
 import { getColor } from "@web/core/colors/colors";
-import { Component, useState, useEffect, useRef } from "@odoo/owl";
+import {
+    Component,
+    useState,
+    useEffect,
+    useRef,
+    onWillStart,
+} from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 export class ChatWindow extends Component {
     static template = "tutorTalk.ChatWindow";
-
+    static props = ["close", "channel_info"];
     setup() {
         this.rpc = useService("rpc");
         this.liveChat = useService("tutoringCentre_liveChat");
         this.userName = _t("Visitor");
         this.member = useState(useService("tutoringCentre_member"));
-        this.channelInfo;
         this.textarea = useRef("textarea");
         this.state = useState({
-            channelMessages: this.liveChat.channelMessages,
+            channelMessages: null,
             text: "",
             parentPickLoading: false,
             parentPickShowPop: false,
             parentPickPopText: "",
+            in_livechat: false,
+        });
+
+        onWillStart(() => {
+            const id = this.props.channel_info.id;
+
+            if (id in this.liveChat.live_channel_messages) {
+                this.state.channelMessages =
+                    this.liveChat.live_channel_messages[id];
+                this.state.in_livechat = true;
+            } else if (id in this.liveChat.announce_channel_messages) {
+                this.state.channelMessages =
+                    this.liveChat.announce_channel_messages[id];
+                this.state.in_livechat = false;
+            } else {
+                console.error(
+                    "tutoringCentre_liveChat 服務中找不到該頻道訊息"
+                );
+            }
         });
 
         useEffect(
@@ -35,14 +59,6 @@ export class ChatWindow extends Component {
             () => [this.state.channelMessages.length]
         );
     }
-
-    get sanitizedMessages() {
-        return this.state.channelMessages.map(message => ({
-            ...message,
-            sanitizedBody: message.body.replace(/<[^>]*>/g, ""),
-        }));
-    }
-
     autoResize() {
         this.textarea.el.style.height = 0;
         this.textarea.el.style.height = `${Math.min(
@@ -51,24 +67,12 @@ export class ChatWindow extends Component {
         )}px`;
     }
 
-    timeFormat(time) {
-        const dateObject = new Date(time);
-
-        const datePart = dateObject.toISOString().split("T")[0];
-        const timePart = dateObject.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-
-        return `${timePart}`;
-    }
     async parentPick() {
-        console.log(7788, this.member.memberInfo, 7878787);
         this.state.parentPickLoading = true;
         const response = await this.rpc(
-            "/tutoringCentre/TutorTalk/api/parentPickup",
+            "/tutoringCentre/api/tutorTalk/parentPickup",
             {
-                childName: this.member.memberInfo.student.name,
+                childName: this.member.memberInfo.student[0].name,
             }
         );
         if (response) {
@@ -83,7 +87,7 @@ export class ChatWindow extends Component {
         }
     }
     async onClickSendMessage() {
-        this.liveChat.sendMessage(this.state.text);
+        this.liveChat.sendMessage(this.props.channel_info.id, this.state.text);
         this.state.text = "";
     }
 }

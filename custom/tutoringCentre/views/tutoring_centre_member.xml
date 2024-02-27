@@ -11,7 +11,6 @@
         <field name="model">tutoring_centre.member</field>
         <field name="arch" type="xml">
             <tree string="目前尚無資料">
-                <!-- <field name="parent"/> -->
                 <field name="student"/>
                 <field name="is_active"/>
                 <field name="portal_user"/>
@@ -29,29 +28,25 @@
                     <div class="container">
                         <form>
                             <div class="d-flex flex-column gap-3">
-                                <div class="d-flex flex-row justify-content-between gap-5 px-0">
-                                    <div class="col-md-6 flex-fill">
-                                        <!-- <label for="parent" class="form-label me-2">家長</label> -->
-                                        <!-- <field name="parent"/> -->
-                                    </div>
-                                    <div class="col-md-6 flex-fill">
-                                        <label for="student" class="form-label me-2">學生</label>
-                                        <field name="student"/>
-                                    </div>
-                                </div>
-
                                 <div class="d-flex flex-column gap-3">
+                                    <div class="mb-3">
+                                        <label for="portal_user" class="form-label">使用者帳號</label>
+                                        <div>
+                                            <field name="portal_user" class="form-control w-100"/>
+                                        </div>
+                                    </div>
                                     <div class="mb-3">
                                         <label for="is_active" class="form-label">帳號狀態</label>
                                         <div>
                                             <field name="is_active" class="form-control w-100" widget="boolean_toggle"/>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="portal_user" class="form-label">使用者帳號</label>
-                                        <div>
-                                            <field name="portal_user" class="form-control w-100"/>
-                                        </div>
+                                </div>
+
+                                <div class="d-flex flex-row justify-content-between gap-5 px-0">
+                                    <div class="col-md-6 flex-fill">
+                                        <label for="student" class="form-label me-2">學生</label>
+                                        <field name="student"/>
                                     </div>
                                 </div>
 

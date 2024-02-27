@@ -31,7 +31,7 @@ class MqttClient(Controller):
                     self.api_calls[message_id].set()
             else:
                 _logger.info(
-                    f"Received message from topic: {message.topic}: {message.payload}"
+                    f"從主題: {message.topic}取得訊息: {message.payload}"
                 )
                 # 關聯API
                 message_id = message.topic
@@ -55,7 +55,7 @@ class MqttClient(Controller):
             _logger.error(f"Error connecting to MQTT Broker: {e}")
 
     @route(
-        "/tutoringCentre/TutorTalk/api/parentPickup",
+        "/tutoringCentre/api/tutorTalk/parentPickup",
         type="json",
         auth="user",
     )

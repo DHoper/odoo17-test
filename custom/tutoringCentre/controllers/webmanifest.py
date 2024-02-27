@@ -17,8 +17,8 @@ class TutoringCentreManifest(http.Controller):
     def webmanifest(self):
         manifest = {
             "name": "補習班平台",
-            "scope": "/tutoringCentre/app",
-            "start_url": "/tutoringCentre/app",
+            "scope": "/tutoringCentre",
+            "start_url": "/tutoringCentre",
             "display": "standalone",
             "background_color": "#714B67",
             "theme_color": "#714B67",
@@ -53,7 +53,7 @@ class TutoringCentreManifest(http.Controller):
             self._get_service_worker_content(),
             [
                 ("Content-Type", "text/javascript"),
-                ("Service-Worker-Allowed", "/tutoringCentre/app"),
+                ("Service-Worker-Allowed", "/tutoringCentre"),
             ],
         )
         return response

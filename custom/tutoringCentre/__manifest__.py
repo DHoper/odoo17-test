@@ -25,9 +25,14 @@
     "installable": True,
     "data": [
         "security/ir.model.access.csv",
+        "views/tutoring_centre_im_livechat.xml",
         "views/tutoring_centre_website_templates.xml",
         # "tutoring_centre_course.xml",
         "views/tutoring_centre_member_student.xml",
+        "views/tutoring_centre_member_livechat.xml",
+        "views/tutoring_centre_course_attendance.xml",
+        "views/tutoring_centre_course.xml",
+        "views/tutoring_centre_teacher.xml",
         "views/tutoring_centre_member.xml",
         "views/tutorTalk/tutor_talk_channel.xml",
         "views/tutorTalk/tutor_talk_parent_pick.xml",
@@ -56,6 +61,13 @@
             # "web/static/src/core/utils/functions.js",
             # "web/static/src/core/browser/browser.js",
             "tutoringCentre/static/src/**/*",
+            (
+                "remove",
+                "tutoringCentre/static/src/views_controller/**/*",
+            ),
+        ],
+        "web.assets_backend": [
+            "tutoringCentre/static/src/views_controller/**/*",
         ],
     },
     "license": "AGPL-3",

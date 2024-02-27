@@ -1,6 +1,9 @@
 /** @odoo-module **/
 
-import { deleteConfirmationMessage, ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import {
+    deleteConfirmationMessage,
+    ConfirmationDialog,
+} from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { CogMenu } from "@web/search/cog_menu/cog_menu";
@@ -15,13 +18,22 @@ import { useModelWithSampleData } from "@web/model/model";
 import { standardViewProps } from "@web/views/standard_view_props";
 import { MultiRecordViewButton } from "@web/views/view_button/multi_record_view_button";
 import { useViewButtons } from "@web/views/view_button/view_button_hook";
-import { addFieldDependencies, extractFieldsFromArchInfo } from "@web/model/relational_model/utils";
+import {
+    addFieldDependencies,
+    extractFieldsFromArchInfo,
+} from "@web/model/relational_model/utils";
 import { KanbanRenderer } from "./kanban_renderer";
 import { useProgressBar } from "./progress_bar_hook";
 
 import { Component, reactive, useRef, useState } from "@odoo/owl";
 
-const QUICK_CREATE_FIELD_TYPES = ["char", "boolean", "many2one", "selection", "many2many"];
+const QUICK_CREATE_FIELD_TYPES = [
+    "char",
+    "boolean",
+    "many2one",
+    "selection",
+    "many2many",
+];
 
 // -----------------------------------------------------------------------------
 
@@ -47,7 +59,7 @@ export class KanbanController extends Component {
                         // example background. Return true so that we don't get sample data instead
                         return true;
                     }
-                    return this.root.groups.some((group) => group.hasData);
+                    return this.root.groups.some(group => group.hasData);
                 }
                 return super.hasData();
             }
@@ -62,7 +74,9 @@ export class KanbanController extends Component {
             async _webReadGroup() {
                 const result = await super._webReadGroup(...arguments);
                 if (!this.initialSampleGroups) {
-                    this.initialSampleGroups = JSON.parse(JSON.stringify(result.groups));
+                    this.initialSampleGroups = JSON.parse(
+                        JSON.stringify(result.groups)
+                    );
                 }
                 return result;
             }
@@ -84,7 +98,11 @@ export class KanbanController extends Component {
         }
 
         this.model = useState(
-            useModelWithSampleData(KanbanSampleModel, this.modelParams, this.modelOptions)
+            useModelWithSampleData(
+                KanbanSampleModel,
+                this.modelParams,
+                this.modelOptions
+            )
         );
         if (archInfo.progressAttributes) {
             const { activeBars } = this.props.state || {};
@@ -121,7 +139,7 @@ export class KanbanController extends Component {
             rootRef: this.rootRef,
             getGlobalState: () => {
                 return {
-                    resIds: this.model.root.records.map((rec) => rec.resId), // WOWL: ask LPE why?
+                    resIds: this.model.root.records.map(rec => rec.resId), // WOWL: ask LPE why?
                 };
             },
             getLocalState: () => {
@@ -143,7 +161,9 @@ export class KanbanController extends Component {
                         await this.model.root.load({ offset, limit });
                         await this.onUpdatedPager();
                     },
-                    updateTotal: hasLimitedCount ? () => root.fetchCount() : undefined,
+                    updateTotal: hasLimitedCount
+                        ? () => root.fetchCount()
+                        : undefined,
                 };
             }
         });
@@ -152,8 +172,15 @@ export class KanbanController extends Component {
 
     get modelParams() {
         const { resModel, archInfo, limit, defaultGroupBy } = this.props;
-        const { activeFields, fields } = extractFieldsFromArchInfo(archInfo, this.props.fields);
-        addFieldDependencies(activeFields, fields, this.progressBarAggregateFields);
+        const { activeFields, fields } = extractFieldsFromArchInfo(
+            archInfo,
+            this.props.fields
+        );
+        addFieldDependencies(
+            activeFields,
+            fields,
+            this.progressBarAggregateFields
+        );
         const modelConfig = this.props.state?.modelState?.config || {
             resModel,
             activeFields,
@@ -215,7 +242,9 @@ export class KanbanController extends Component {
     }
 
     async openRecord(record, mode) {
-        const activeIds = this.model.root.records.map((datapoint) => datapoint.resId);
+        const activeIds = this.model.root.records.map(
+            datapoint => datapoint.resId
+        );
         this.props.selectRecord(record.resId, { activeIds, mode });
     }
 
@@ -274,8 +303,8 @@ export class KanbanController extends Component {
 
     onRecordSaved(record) {
         if (this.model.root.isGrouped) {
-            const group = this.model.root.groups.find((l) =>
-                l.records.find((r) => r.id === record.id)
+            const group = this.model.root.groups.find(l =>
+                l.records.find(r => r.id === record.id)
             );
             this.progressBarState?.updateCounts(group);
         }
@@ -297,11 +326,17 @@ export class KanbanController extends Component {
 }
 
 KanbanController.template = `web.KanbanView`;
-KanbanController.components = { Layout, KanbanRenderer, MultiRecordViewButton, SearchBar, CogMenu };
+KanbanController.components = {
+    Layout,
+    KanbanRenderer,
+    MultiRecordViewButton,
+    SearchBar,
+    CogMenu,
+};
 KanbanController.props = {
     ...standardViewProps,
     defaultGroupBy: {
-        validate: (dgb) => !dgb || typeof dgb === "string",
+        validate: dgb => !dgb || typeof dgb === "string",
         optional: true,
     },
     editable: { type: Boolean, optional: true },

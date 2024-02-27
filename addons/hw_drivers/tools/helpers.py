@@ -105,7 +105,7 @@ def check_certificate():
 
     try:
         with path.open('r') as f:
-            cert = crypto.load_certificate(crypto.FILETYPE_PEM, f.read())
+            cert = crypto.load_certificate(crypto.FILETYPE_PEM, f))
     except EnvironmentError:
         _logger.exception("Unable to read certificate file")
         return {"status": CertificateStatus.ERROR,

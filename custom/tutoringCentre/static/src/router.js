@@ -27,7 +27,7 @@ export class Router extends Component {
 
     setup() {
         this.router = useState(useService("tutoringCentre_router"));
-        this.activeSlot = "home";
+        this.activeSlot = "default";
         this.slotProps = {};
         this.routes = {};
 
@@ -58,8 +58,6 @@ export class Router extends Component {
 
             this.routes[routeName] = { route, paramSpecs, regex };
         }
-
-        console.log(88, this.routes);
         this.router.registerRoutes(this.routes);
 
         onWillRender(() => {
@@ -69,8 +67,6 @@ export class Router extends Component {
 
     matchURL() {
         const path = this.router.path;
-
-        console.log(path, this.routes);
 
         for (const [routeName, { paramSpecs, regex }] of Object.entries(
             this.routes
@@ -85,7 +81,7 @@ export class Router extends Component {
             }
         }
 
-        this.router.activeSlot = "home";
-        this.router.navigate("home");
+        this.router.activeSlot = "default";
+        this.router.navigate("default");
     }
 }

@@ -1,58 +1,45 @@
 /** @odoo-module */
-import {
-    Component,
-    onWillStart,
-    useState,
-    useEffect,
-    reactive,
-} from "@odoo/owl";
+import { Component, onWillStart, onRendered, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-import { browser } from "@web/core/browser/browser";
-import { ChatWindow } from "./TutorTalk/ChatWindow/ChatWindow";
+import { Home } from "./Home/Home";
 import { MemberRegister } from "./pages/Member_register";
+import { TutorTalk } from "./TutorTalk/TutorTalk";
 import { Router } from "./router";
 
 export class Root extends Component {
-    static template = "tutorTalk.Root";
-    static components = { Router, ChatWindow, MemberRegister };
+    static template = "tutoringCentre.Root";
+    static components = {
+        Router,
+        Home,
+        TutorTalk,
+        MemberRegister,
+    };
     static props = {};
     async setup() {
-        onWillStart(() => this.registerServiceWorker());
+        onWillStart(() => {
+            this.registerServiceWorker();
+        });
         this.rpc = useService("rpc");
-        this.router = useService("tutoringCentre_router");
+        this.router = useState(useService("tutoringCentre_router"));
         this.memberService = useState(useService("tutoringCentre_member"));
-        // this.state = useState({
-        //     routerComponent: ChatWindow,
-        // });
 
-        // this.props = {
-        //     changeRoute: this.changeRoute.bind(this),
-        // };
+        this.state = useState({
+            currentRoute: "default",
+        });
 
-        // await this.memberService.init();
-
-        // if (!this.memberService.state.registration) {
-        //     this.state.routerComponent = MemberRegister;
-        // }
+        this.navigate = this.navigate.bind(this);
     }
 
-    // changeRoute(routeStr) {
-    //     const routeComponent = {
-    //         MemberRegister: MemberRegister,
-    //         ChatWindow: ChatWindow,
-    //     };
-
-    //     const path = `/tutoringCentre/${routeStr}`;
-    //     history.pushState({}, "", `${window.location.pathname}${path}`);
-
-    //     this.state.routerComponent = routeComponent[routeStr];
-    // }
+    navigate(route) {
+        this.router.navigate(route);
+        this.state.currentRoute = route;
+    }
 
     registerServiceWorker() {
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker
                 .register("/tutoringCentre/service-worker", {
-                    scope: "/tutoringCentre/app",
+                    scope: "/tutoringCentre",
                 })
                 .then(registration => {
                     if (Notification.permission !== "granted") {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="tutorTalk.member_register">
+    <t t-name="tutoringCentre.Member_register">
         <div t-if="state.step === 0" class="hero h-screen bg-gradient-to-b from-blue-500 to-blue-700 flex justify-center items-center px-2 py-4">
             <div class="hero-content text-center">
                 <div class="max-w-md animate__animated animate__fadeIn duration-1000">

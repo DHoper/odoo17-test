@@ -4,7 +4,7 @@ import { registry } from "@web/core/registry";
 import { Reactive } from "@web/core/utils/reactive";
 import { browser } from "@web/core/browser/browser";
 
-export class SelfOrderRouter extends Reactive {
+export class TutoringCentreRouter extends Reactive {
     static serviceDependencies = [];
 
     constructor(...args) {
@@ -12,7 +12,7 @@ export class SelfOrderRouter extends Reactive {
         this.setup(...args);
     }
 
-    setup(env) {
+    setup() {
         this.path = window.location.pathname;
         this.registeredRoutes = {};
         this.historyPage = "";
@@ -20,6 +20,7 @@ export class SelfOrderRouter extends Reactive {
         window.addEventListener("popstate", event => {
             this.path = window.location.pathname;
         });
+        this.bottomNav = true;
     }
 
     addTableIdentifier(table) {
@@ -48,7 +49,6 @@ export class SelfOrderRouter extends Reactive {
      * @param {string} route
      */
     navigate(routeName, routeParams = {}) {
-        console.log(routeName, this.registeredRoutes, 444);
         const { route } = this.registeredRoutes[routeName];
         const url = new URL(browser.location.href);
 
@@ -63,7 +63,6 @@ export class SelfOrderRouter extends Reactive {
 
     registerRoutes(routes) {
         Object.assign(this.registeredRoutes, routes);
-        console.log(this.registeredRoutes, 758);
     }
 
     // If the url isn't a valid URL, we assume it's a relative path
@@ -84,13 +83,13 @@ export class SelfOrderRouter extends Reactive {
     }
 }
 
-export const SelfOrderRouterService = {
-    dependencies: SelfOrderRouter.serviceDependencies,
+export const TutoringCentreRouterService = {
+    dependencies: TutoringCentreRouter.serviceDependencies,
     async start(env, deps) {
-        return new SelfOrderRouter(env, deps);
+        return new TutoringCentreRouter(env, deps);
     },
 };
 
 registry
     .category("services")
-    .add("tutoringCentre_router", SelfOrderRouterService);
+    .add("tutoringCentre_router", TutoringCentreRouterService);
