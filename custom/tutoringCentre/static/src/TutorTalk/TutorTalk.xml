@@ -1,0 +1,77 @@
+<templates xml:space="preserve">
+    <t t-name="tutorTalk.Root">
+        <div>
+            <div class="h-full px-1 py-6">
+                <div class="px-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">頻道列表</h2>
+                </div>
+
+                <!-- 公告頻道 -->
+                <ul t-if="state.announce_channels">
+                    <li t-foreach="state.announce_channels" t-as="channel" t-key="channel.id" t-on-click="() => openChatWindow(channel.id, channel.name, channel.image)">
+                        <div class="flex items-center space-x-4 p-4 cursor-pointer hover:bg-gray-50 transition-colors relative">
+                            <div class="flex-shrink-0 bg-purple-100 border border-purple-300 rounded-full p-1">
+                                <img t-if="channel.image" t-attf-src="data:image/png;base64,{{ channel.image }}" alt="Avatar" class="h-10 w-10 rounded-full"/>
+                                <img t-else="" src="/tutoringCentre/static/src/img/livechat-channel.png" alt="Team-spirit" class="h-10 w-10 rounded-full"/>
+                            </div>
+
+                            <div class="flex flex-col flex-grow gap-1">
+                                <div class="flex justify-between items-center">
+                                    <p class="text-sm font-semibold text-purple-500 truncate max-w-xs" t-esc="channel.display_name"></p>
+                                    <p t-if="state.last_message_list[channel.id]" class="text-xs font-medium text-gray-600">
+                                        <time class="text-[12px]">
+                                            <span t-esc="state.last_message_list[channel.id].write_date"/>
+                                        </time>
+                                    </p>
+                                </div>
+                                <div class="w-full flex justify-between items-center">
+                                    <p t-if="state.last_message_list[channel.id]" class="text-xs text-gray-600 truncate max-w-xs pt-2" t-esc="state.last_message_list[channel.id].body"/>
+                                    <span t-if="livechat.last_message_notify[channel.id]" class="px-2 py-1 text-red-500 rounded-full bg-red-500/20 text-[10px]">
+                                        <t t-esc="'New'"/>
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- 客服頻道 -->
+                <ul t-if="state.live_channels">
+                    <li t-foreach="state.live_channels" t-as="channel" t-key="channel.id" t-on-click="() => openChatWindow(channel.id, channel.name, channel.image)">
+                        <div class="flex items-center space-x-4 p-4 cursor-pointer hover:bg-gray-50 transition-colors relative">
+                            <div class="flex-shrink-0 bg-blue-100 border border-blue-300 rounded-full p-1">
+                                <img t-if="channel.image" t-attf-src="data:image/png;base64,{{ channel.image }}" alt="Avatar" class="h-10 w-10 rounded-full"/>
+                                <img t-else="" src="/tutoringCentre/static/src/img/livechat-channel.png" alt="Team-spirit" class="h-10 w-10 rounded-full"/>
+                            </div>
+
+                            <div class="flex flex-col flex-grow gap-1">
+                                <div class="flex justify-between items-center">
+                                    <p class="text-sm font-semibold text-blue-500 truncate max-w-xs" t-esc="channel.name"></p>
+                                    <p t-if="state.last_message_list[channel.id]" class="text-xs font-medium text-gray-600">
+                                        <time class="text-[12px]">
+                                            <span t-esc="state.last_message_list[channel.id].write_date"/>
+                                        </time>
+                                    </p>
+                                </div>
+                                <div class="w-full flex justify-between items-center">
+                                    <p t-if="state.last_message_list[channel.id]" class="text-xs text-gray-600 truncate max-w-xs pt-2" t-esc="state.last_message_list[channel.id].body"/>
+                                    <span t-if="livechat.last_message_notify[channel.id]" class="px-2 py-1 text-red-500 rounded-full bg-red-500/20 text-[10px]">
+                                        <t t-esc="'New'"/>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+
+            <div t-if="state.showChatWindow" class="z-10 absolute top-0 w-full z-10 animate__animated duration-75" t-att-class="state.animateClass">
+                <ChatWindow close="closeChatWindow" channel_info="state.currentChannelInfo" />
+            </div>
+        </div>
+    </t>
+</templates>

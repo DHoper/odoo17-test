@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="tutoring_centre_course_attendance_panel" model="ir.ui.view">
+        <field name="name">補習班點名系統-點名介面</field>
+        <field name="model">tutoring_centre.member_student</field>
+        <field name="arch" type="xml">
+            <tree string="目前尚無資料">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_open_attendance_panel" model="ir.actions.act_window">
+        <field name="name">補習班點名系統-點名介面</field>
+        <field name="res_model">tutoring_centre.member_student</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="tutoringCentre.tutoring_centre_course_attendance_panel"/>
+        <field name="context">{'course_id': active_id}</field>
+    </record>
+
+    <record id="tutoring_centre_course_attendance_kanban" model="ir.ui.view">
+        <field name="name">tutoring_centre.course.attendance.kanban</field>
+        <field name="model">tutoring_centre.course</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <field name="name"/>
+                                </h5>
+                                <!-- Add additional fields here if needed -->
+                            </div>
+                            <div class="card-footer">
+                                <button type="action" name="%(tutoringCentre.action_open_attendance_panel)d" class="btn btn-primary">點名</button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+
+            </kanban>
+        </field>
+    </record>
+
+    <record id="tutoring_centre_course_attendance_action" model="ir.actions.act_window">
+        <field name="name">補習班點名系統</field>
+        <field name="res_model">tutoring_centre.course</field>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="tutoringCentre.tutoring_centre_course_attendance_kanban"/>
+    </record>
+
+    <record id="send_group_message" model="ir.actions.server">
+        <field name="name">發送點名訊息</field>
+        <field name="model_id" ref="tutoringCentre.model_tutoring_centre_member_student"/>
+        <field name="binding_model_id" ref="tutoringCentre.model_tutoring_centre_member_student"/>
+        <field name="binding_view_types">tree</field>
+        <field name="state">code</field>
+        <!-- code內代碼不能縮排(!?) -->
+        <field name="code">
+course_id = env.context.get('course_id')
+action = env['tutoring_centre.course'].roll_call(course_id,records)
+        </field>
+    </record>
+
+
+</odoo>

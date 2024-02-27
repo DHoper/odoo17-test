@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="tutoring_centre_teacher_action" model="ir.actions.act_window">
+        <field name="name">補習班教師</field>
+        <field name="res_model">tutoring_centre.teacher</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="tutoring_center_teacher_tree_view" model="ir.ui.view">
+        <field name="name">tutoring_centre.teacher_list_view</field>
+        <field name="model">tutoring_centre.teacher</field>
+        <field name="arch" type="xml">
+            <tree string="目前尚無資料">
+                <field name="name"/>
+                <field name="is_active"/>
+                <field name="portal_user"/>
+                <field name="courses" />
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="tutoring_center_teacher_form_view" model="ir.ui.view">
+        <field name="name">tutoring_centre.teacher_form_view</field>
+        <field name="model">tutoring_centre.teacher</field>
+        <field name="arch" type="xml">
+            <form string="目前尚無資料">
+                <sheet>
+                    <div class="container">
+                        <form>
+                            <div class="d-flex flex-column gap-3">
+                                <div class="d-flex flex-column gap-3">
+                                    <div class="mb-3">
+                                        <label for="portal_user" class="form-label">使用者帳號</label>
+                                        <div>
+                                            <field name="portal_user" class="form-control w-100"/>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">姓名</label>
+                                        <div>
+                                            <field name="name" class="form-control w-100"/>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="is_active" class="form-label">帳號狀態</label>
+                                        <div>
+                                            <field name="is_active" class="form-control w-100" widget="boolean_toggle"/>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="courses" class="form-label">負責班級</label>
+                                        <div>
+                                            <field name="courses" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
